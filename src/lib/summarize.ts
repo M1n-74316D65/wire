@@ -12,6 +12,24 @@ export type SummaryRow = {
   created_at: number;
 };
 
+const SYSTEM = `You write briefs for wire, a personal news desk.
+
+Voice: neutral, factual, information-first. No hype, no clickbait, no moralizing.
+Never invent facts, quotes, numbers, or outcomes that are not in the article.
+Match the article language (Spanish in, Spanish out; English in, English out).
+
+Structure exactly:
+1) One short lead paragraph (1–2 sentences): what happened.
+2) Three to five bullets ("- ") with the load-bearing details: who, what, when, where, numbers, decisions, consequences.
+3) Optional one-line closer only if the article itself states what happens next.
+
+Formatting:
+- Plain text only. No markdown headings, no bold, no links.
+- Bullets must start with "- ".
+- No preamble ("Here is…", "Summary:", "En resumen:").
+- Do not repeat the title as a heading.
+- Keep the whole brief under ~180 words.`;
+
 export function getCachedSummary(url: string): SummaryRow | null {
   const row = getDb()
     .prepare("SELECT url, title, summary, model, created_at FROM summaries WHERE url = ?")
@@ -60,21 +78,20 @@ export async function summarizeUrl(opts: {
 
   const article = await fetchArticleText(opts.url);
   const provider = createOpenAICompatible({
-    name: "news-ai",
+    name: "wire-ai",
     apiKey: ai.apiKey,
     baseURL: ai.baseURL,
   });
 
   const { text } = await generateText({
     model: provider.chatModel(ai.model),
-    system:
-      "You summarize news articles for a minimalist headline reader. " +
-      "Write a clear, neutral summary in 3–6 short paragraphs or bullets. " +
-      "No hype, no marketing tone, no invented facts. Match the article language.",
+    system: SYSTEM,
     prompt:
-      `Title: ${opts.title || "(unknown)"}\n` +
+      `Title: ${opts.title?.trim() || "(unknown)"}\n` +
       `URL: ${opts.url}\n\n` +
       `Article text:\n${article}`,
+    maxOutputTokens: 700,
+    temperature: 0.2,
   });
 
   const summary = text.trim();

@@ -1,5 +1,6 @@
 import { PageChrome } from "@/components/PageChrome";
 import { SummarizeForm } from "@/components/SummarizeForm";
+import { SummaryBody } from "@/components/SummaryBody";
 import { summarizeConfigured } from "@/lib/env";
 import { lastUpdatedLabel } from "@/lib/queries";
 import { getCachedSummary, summarizeUrl } from "@/lib/summarize";
@@ -32,6 +33,7 @@ export default async function SummarizePage({ searchParams }: Props) {
 
   let summaryText: string | null = null;
   let model: string | null = null;
+  let createdAt: number | null = null;
   let runError: string | null = null;
 
   if (url && configured) {
@@ -40,27 +42,33 @@ export default async function SummarizePage({ searchParams }: Props) {
     if (cached) {
       summaryText = cached.summary;
       model = cached.model;
+      createdAt = cached.created_at;
     } else if (unlocked && wantRun) {
       try {
         const row = await summarizeUrl({ url, title: title || null, force });
         summaryText = row.summary;
         model = row.model;
+        createdAt = row.created_at;
       } catch (err) {
         runError = err instanceof Error ? err.message : String(err);
       }
     }
   }
 
+  const regenerateHref = url
+    ? `/summarize?url=${encodeURIComponent(url)}${title ? `&title=${encodeURIComponent(title)}` : ""}&run=1&force=1`
+    : "/";
+
   return (
     <PageChrome
       theme={theme}
       lastUpdated={lastUpdatedLabel()}
       showFilters={false}
-      title="Summarize"
+      title="Brief"
     >
-      <div className="prose">
+      <div className="brief-page">
         {!configured ? (
-          <p>
+          <p className="lede">
             Not configured. Set <code>AI_API_KEY</code>, <code>AI_MODEL</code>, and{" "}
             <code>SUMMARIZE_PASSWORD</code> in <code>.env</code>.
           </p>
@@ -70,38 +78,46 @@ export default async function SummarizePage({ searchParams }: Props) {
         {runError ? <p className="error">Error: {runError}</p> : null}
 
         {summaryText ? (
-          <>
-            {title ? <h3>{title}</h3> : null}
-            <p>
-              <a href={url} rel="noopener noreferrer">
-                {url}
-              </a>
-            </p>
-            <div className="summary">{summaryText}</div>
-            {model ? (
-              <p className="meta">
-                model: {model}
-                {unlocked ? " · unlocked" : null}
+          <article className="brief-card">
+            {title ? <h1 className="brief-card__title">{title}</h1> : null}
+            {url ? (
+              <p className="brief-card__source">
+                <a href={url} rel="noopener noreferrer">
+                  Read original · {hostname(url)}
+                </a>
               </p>
             ) : null}
-            <p>
-              <a
-                href={
-                  url
-                    ? `/summarize?url=${encodeURIComponent(url)}${title ? `&title=${encodeURIComponent(title)}` : ""}&run=1&force=1`
-                    : "/"
-                }
-              >
-                Regenerate
-              </a>
-              {" · "}
-              <a href="/">Back</a>
-            </p>
-          </>
+
+            <SummaryBody text={summaryText} />
+
+            <footer className="brief-card__foot">
+              <span className="meta meta--wrap">
+                {model ? model : null}
+                {createdAt
+                  ? ` · ${new Date(createdAt).toLocaleString(undefined, {
+                      dateStyle: "medium",
+                      timeStyle: "short",
+                    })}`
+                  : null}
+              </span>
+              <nav className="brief-card__actions">
+                <a href={regenerateHref}>Rewrite</a>
+                <a href="/">Desk</a>
+              </nav>
+            </footer>
+          </article>
         ) : configured ? (
           <SummarizeForm url={url} title={title} unlocked={unlocked} />
         ) : null}
       </div>
     </PageChrome>
   );
+}
+
+function hostname(raw: string): string {
+  try {
+    return new URL(raw).hostname.replace(/^www\./, "");
+  } catch {
+    return raw;
+  }
 }
