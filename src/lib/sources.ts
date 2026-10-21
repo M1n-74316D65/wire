@@ -6,8 +6,7 @@ export type Topic =
   | "science"
   | "gaming"
   | "culture"
-  | "politics"
-  | "sports";
+  | "politics";
 
 export type Source = {
   slug: string;
@@ -27,7 +26,6 @@ export const TOPICS: { slug: Topic; label: string }[] = [
   { slug: "gaming", label: "Gaming" },
   { slug: "culture", label: "Culture" },
   { slug: "politics", label: "Politics" },
-  { slug: "sports", label: "Sports" },
 ];
 
 /** Curated RSS sources for the personal wire. */
@@ -284,21 +282,6 @@ export const SOURCES: Source[] = [
     topics: ["politics", "news"],
     home: false,
   },
-  // Sports
-  {
-    slug: "espn",
-    name: "ESPN",
-    feedUrl: "https://www.espn.com/espn/rss/news",
-    topics: ["sports"],
-    home: false,
-  },
-  {
-    slug: "bbc-sport",
-    name: "BBC Sport",
-    feedUrl: "https://feeds.bbci.co.uk/sport/rss.xml",
-    topics: ["sports"],
-    home: false,
-  },
   // Spain
   {
     slug: "elpais",
@@ -369,13 +352,6 @@ export const SOURCES: Source[] = [
     name: "Genbeta",
     feedUrl: "https://www.genbeta.com/index.xml",
     topics: ["spain", "tech"],
-    home: false,
-  },
-  {
-    slug: "marca",
-    name: "Marca",
-    feedUrl: "https://www.marca.com/rss/portada.xml",
-    topics: ["spain", "sports"],
     home: false,
   },
 ];
