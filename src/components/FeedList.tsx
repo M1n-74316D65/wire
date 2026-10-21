@@ -1,3 +1,4 @@
+import { AiLink } from "@/components/AiLink";
 import { summarizeConfigured } from "@/lib/env";
 import type { Headline } from "@/lib/queries";
 import { getSource } from "@/lib/sources";
@@ -30,7 +31,6 @@ export function FeedList({
     <ol className="feed">
       {headlines.map((h) => {
         const source = getSource(h.sourceSlug);
-        const summarizeHref = `/summarize?url=${encodeURIComponent(h.url)}&title=${encodeURIComponent(h.title)}`;
         return (
           <li key={h.url} className="feed__item">
             {source ? (
@@ -56,11 +56,7 @@ export function FeedList({
                   hn
                 </a>
               ) : null}
-              {aiEnabled ? (
-                <a className="tag tag--ai" href={summarizeHref}>
-                  ai
-                </a>
-              ) : null}
+              {aiEnabled ? <AiLink url={h.url} title={h.title} /> : null}
             </span>
           </li>
         );

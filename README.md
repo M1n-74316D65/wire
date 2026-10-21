@@ -1,6 +1,6 @@
 # wire
 
-Personal RSS desk. Curated feeds land in SQLite; the UI is a chronological stream with a side rail for sections.
+Personal RSS desk at [news.m1n.land](https://news.m1n.land/). Curated feeds land in SQLite; the UI is a chronological stream with a side rail for sections.
 
 ## Local setup
 
@@ -11,7 +11,7 @@ bun run ingest
 bun run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000). Production: [https://news.m1n.land](https://news.m1n.land/).
 
 ### Environment
 
@@ -54,10 +54,17 @@ Redeploy after saving.
 Hit ingest once after deploy:
 
 ```bash
-curl -H "Authorization: Bearer $CRON_SECRET" https://YOUR_DOMAIN/api/ingest
+curl -H "Authorization: Bearer $CRON_SECRET" https://news.m1n.land/api/ingest
 ```
 
 Optional: Vercel Cron → path `/api/ingest`, schedule e.g. `*/30 * * * *`, and send header `Authorization: Bearer <CRON_SECRET>` (configure in `vercel.json` / project crons + protect the route with `CRON_SECRET`).
+
+### Custom domain
+
+Production hostname: **`news.m1n.land`**
+
+1. Project → **Settings → Domains** → add `news.m1n.land`.
+2. At your DNS for `m1n.land`, point `news` as Vercel instructs (usually CNAME → `cname.vercel-dns.com`).
 
 ### 4. Durable alternative (recommended)
 

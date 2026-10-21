@@ -5,7 +5,7 @@ import { SOURCES } from "./sources";
 const parser = new Parser({
   timeout: 15_000,
   headers: {
-    "User-Agent": "news-aggregator/0.1 (+https://localhost; RSS reader)",
+    "User-Agent": "wire/0.1 (+https://news.m1n.land; RSS reader)",
     Accept: "application/rss+xml, application/atom+xml, application/xml, text/xml",
   },
 });

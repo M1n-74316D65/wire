@@ -20,6 +20,7 @@ export const metadata: Metadata = {
   title: "wire",
   description: "A quiet desk for the feeds you keep.",
   keywords: ["news", "headlines", "rss", "wire"],
+  metadataBase: new URL("https://news.m1n.land"),
 };
 
 export default async function RootLayout({

@@ -21,7 +21,7 @@ export async function fetchArticleText(url: string): Promise<string> {
   const res = await fetch(url, {
     headers: {
       "User-Agent":
-        "Mozilla/5.0 (compatible; NewsSummarizer/0.1; +http://localhost)",
+        "Mozilla/5.0 (compatible; wire/0.1; +https://news.m1n.land)",
       Accept: "text/html,application/xhtml+xml",
     },
     redirect: "follow",

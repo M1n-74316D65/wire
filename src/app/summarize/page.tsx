@@ -1,10 +1,10 @@
 import { PageChrome } from "@/components/PageChrome";
+import { SummarizeForm } from "@/components/SummarizeForm";
 import { summarizeConfigured } from "@/lib/env";
 import { lastUpdatedLabel } from "@/lib/queries";
 import { getCachedSummary, summarizeUrl } from "@/lib/summarize";
 import { isSummarizeUnlocked } from "@/lib/summarize-auth";
 import { getTheme } from "@/lib/theme";
-import { unlockAndSummarizeAction } from "./actions";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -28,15 +28,19 @@ export default async function SummarizePage({ searchParams }: Props) {
   const configured = summarizeConfigured();
   const queryError = sp.error ? decodeURIComponent(sp.error) : null;
   const force = sp.force === "1";
+  const wantRun = sp.run === "1" || force;
 
   let summaryText: string | null = null;
   let model: string | null = null;
   let runError: string | null = null;
 
-  if (url && configured && sp.run === "1") {
-    if (!unlocked) {
-      runError = "Password required to summarize";
-    } else {
+  if (url && configured) {
+    const cached = force ? null : getCachedSummary(url);
+
+    if (cached) {
+      summaryText = cached.summary;
+      model = cached.model;
+    } else if (unlocked && wantRun) {
       try {
         const row = await summarizeUrl({ url, title: title || null, force });
         summaryText = row.summary;
@@ -44,12 +48,6 @@ export default async function SummarizePage({ searchParams }: Props) {
       } catch (err) {
         runError = err instanceof Error ? err.message : String(err);
       }
-    }
-  } else if (url && configured) {
-    const cached = getCachedSummary(url);
-    if (cached) {
-      summaryText = cached.summary;
-      model = cached.model;
     }
   }
 
@@ -61,7 +59,6 @@ export default async function SummarizePage({ searchParams }: Props) {
       title="Summarize"
     >
       <div className="prose">
-
         {!configured ? (
           <p>
             Not configured. Set <code>AI_API_KEY</code>, <code>AI_MODEL</code>, and{" "}
@@ -101,32 +98,9 @@ export default async function SummarizePage({ searchParams }: Props) {
               <a href="/">Back</a>
             </p>
           </>
-        ) : (
-          <form action={unlockAndSummarizeAction} className="summarize-form">
-            <label htmlFor="url">URL</label>
-            <input id="url" type="url" name="url" required defaultValue={url} />
-
-            <label htmlFor="title">Title (optional)</label>
-            <input id="title" type="text" name="title" defaultValue={title} />
-
-            {!unlocked ? (
-              <>
-                <label htmlFor="password">Password</label>
-                <input
-                  id="password"
-                  type="password"
-                  name="password"
-                  required
-                  autoComplete="current-password"
-                />
-              </>
-            ) : (
-              <p className="meta">Session unlocked — password not required.</p>
-            )}
-
-            <button type="submit">Summarize</button>
-          </form>
-        )}
+        ) : configured ? (
+          <SummarizeForm url={url} title={title} unlocked={unlocked} />
+        ) : null}
       </div>
     </PageChrome>
   );

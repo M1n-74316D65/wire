@@ -18,6 +18,16 @@ function safeUrl(raw: string): string | null {
   }
 }
 
+/** Unlock session with password. Returns false if wrong. */
+export async function unlockWithPasswordAction(
+  password: string,
+): Promise<boolean> {
+  if (!summarizeConfigured()) return false;
+  if (!checkPassword(password)) return false;
+  await unlockSummarize();
+  return true;
+}
+
 /** Verify password (if needed), unlock session, redirect to run summarize. */
 export async function unlockAndSummarizeAction(formData: FormData) {
   const rawUrl = String(formData.get("url") || "");

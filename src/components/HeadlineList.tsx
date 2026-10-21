@@ -1,3 +1,4 @@
+import { AiLink } from "@/components/AiLink";
 import { summarizeConfigured } from "@/lib/env";
 import type { Headline } from "@/lib/queries";
 import { relativeTime } from "@/lib/time";
@@ -18,7 +19,6 @@ export function HeadlineList({
   return (
     <ul className="headline-list">
       {headlines.map((h) => {
-        const summarizeHref = `/summarize?url=${encodeURIComponent(h.url)}&title=${encodeURIComponent(h.title)}`;
         return (
           <li key={h.url}>
             <a className="headline" href={h.url} rel="noopener noreferrer">
@@ -36,9 +36,7 @@ export function HeadlineList({
             {aiEnabled ? (
               <>
                 {" "}
-                <a className="tag tag--ai" href={summarizeHref}>
-                  ai
-                </a>
+                <AiLink url={h.url} title={h.title} />
               </>
             ) : null}
           </li>
