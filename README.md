@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# wire
 
-## Getting Started
+Personal RSS desk. Curated feeds land in SQLite; the UI is a chronological stream with a side rail for sections.
 
-First, run the development server:
+## Local setup
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+bun install
+cp .env.example .env
+bun run ingest
+bun run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Environment
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `AI_API_KEY` | for `ai` summaries | OpenAI-compatible API key |
+| `AI_BASE_URL` | no | Default `https://api.openai.com/v1` |
+| `AI_MODEL` | no | Default `gpt-4o-mini` |
+| `SUMMARIZE_PASSWORD` | for `ai` summaries | Password before summarizing |
+| `CRON_SECRET` | recommended in prod | Shared secret for `/api/ingest` |
 
-## Learn More
+Without `AI_API_KEY` and `SUMMARIZE_PASSWORD`, the app still runs; `ai` links are hidden.
 
-To learn more about Next.js, take a look at the following resources:
+## Deploy (Vercel)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+This app uses **SQLite** (`better-sqlite3`). On Vercel the filesystem is ephemeral, so the DB does not survive across instances. For a durable deploy, prefer a host with a persistent disk (Fly.io, Railway, a VPS). The steps below still work for a quick Vercel preview if you re-ingest after each cold start.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 1. Push & import
 
-## Deploy on Vercel
+1. Push this repo to GitHub.
+2. [vercel.com/new](https://vercel.com/new) → import the repo.
+3. Framework preset: **Next.js**. Install / build leave as detected (`bun install` / `bun run build` if you set Bun as the install command, or npm equivalents).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 2. Environment variables
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+In the Vercel project → **Settings → Environment Variables**, add for Production (and Preview if you want):
+
+```
+AI_API_KEY=
+AI_BASE_URL=https://api.openai.com/v1
+AI_MODEL=gpt-4o-mini
+SUMMARIZE_PASSWORD=
+CRON_SECRET=
+```
+
+Redeploy after saving.
+
+### 3. Refresh feeds
+
+Hit ingest once after deploy:
+
+```bash
+curl -H "Authorization: Bearer $CRON_SECRET" https://YOUR_DOMAIN/api/ingest
+```
+
+Optional: Vercel Cron → path `/api/ingest`, schedule e.g. `*/30 * * * *`, and send header `Authorization: Bearer <CRON_SECRET>` (configure in `vercel.json` / project crons + protect the route with `CRON_SECRET`).
+
+### 4. Durable alternative (recommended)
+
+- **Fly.io / Railway / VPS**: attach a volume, point the process at `data/news.sqlite`, run `bun run ingest` on a schedule (cron or systemd timer).
+- Same env vars as above.
+
+## Routes
+
+| Path | What |
+|------|------|
+| `/` | Desk (curated home feeds) |
+| `/topic/{slug}` | Section stream (`all`, `spain`, `tech`, …) |
+| `/source/{slug}` | Single source |
+| `/words` | Title keyword cloud |
+| `/summarize` | AI article summary (password-gated) |
+| `/api` | JSON home snapshot |
+| `/api/topic/{slug}` | JSON topic snapshot |
+| `/api/ingest` | Refresh feeds |
+
+Query params: `?limit=5|10|15|25|50`, `?hours=1|3|6|12|24`.
+
+Theme: `auto` / `day` / `night` via cookie (form POST, no JS).

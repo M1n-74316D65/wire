@@ -6,14 +6,21 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "ingest": "bun run scripts/ingest.ts"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^4.0.99",
+    "@ai-sdk/openai-compatible": "^3.0.75",
+    "ai": "^7.0.148",
+    "better-sqlite3": "^13.0.3",
     "next": "16.4.2",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "rss-parser": "^3.13.0"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^9.6.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -27,6 +34,7 @@
     "unrs-resolver"
   ],
   "trustedDependencies": [
+    "better-sqlite3",
     "sharp",
     "unrs-resolver"
   ]
