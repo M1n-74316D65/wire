@@ -10,12 +10,29 @@ export type HeadlineRow = {
   published_at: number;
   hn_url: string | null;
   ingested_at: number;
+  topic: string | null;
+  topic_confidence: number | null;
+  topic_model: string | null;
 };
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const DB_PATH = path.join(DATA_DIR, "news.sqlite");
 
 let db: Database.Database | null = null;
+
+function ensureColumn(
+  database: Database.Database,
+  table: string,
+  column: string,
+  ddl: string,
+) {
+  const cols = database.prepare(`PRAGMA table_info(${table})`).all() as {
+    name: string;
+  }[];
+  if (!cols.some((c) => c.name === column)) {
+    database.exec(`ALTER TABLE ${table} ADD COLUMN ${ddl}`);
+  }
+}
 
 export function getDb(): Database.Database {
   if (db) return db;
@@ -31,12 +48,17 @@ export function getDb(): Database.Database {
       published_at INTEGER NOT NULL,
       hn_url TEXT,
       ingested_at INTEGER NOT NULL,
+      topic TEXT,
+      topic_confidence REAL,
+      topic_model TEXT,
       UNIQUE(source_slug, url)
     );
     CREATE INDEX IF NOT EXISTS idx_headlines_source_pub
       ON headlines(source_slug, published_at DESC);
     CREATE INDEX IF NOT EXISTS idx_headlines_pub
       ON headlines(published_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_headlines_topic_pub
+      ON headlines(topic, published_at DESC);
     CREATE TABLE IF NOT EXISTS meta (
       key TEXT PRIMARY KEY,
       value TEXT NOT NULL
@@ -49,6 +71,16 @@ export function getDb(): Database.Database {
       created_at INTEGER NOT NULL
     );
   `);
+
+  // Existing DBs created before topic columns
+  ensureColumn(db, "headlines", "topic", "topic TEXT");
+  ensureColumn(db, "headlines", "topic_confidence", "topic_confidence REAL");
+  ensureColumn(db, "headlines", "topic_model", "topic_model TEXT");
+  db.exec(
+    `CREATE INDEX IF NOT EXISTS idx_headlines_topic_pub
+     ON headlines(topic, published_at DESC)`,
+  );
+
   return db;
 }
 
@@ -66,4 +98,30 @@ export function setLastIngestAt(ts: number) {
        ON CONFLICT(key) DO UPDATE SET value = excluded.value`,
     )
     .run(String(ts));
+}
+
+export function setHeadlineTopic(
+  id: number,
+  topic: string,
+  confidence: number,
+  model: string,
+) {
+  getDb()
+    .prepare(
+      `UPDATE headlines
+       SET topic = ?, topic_confidence = ?, topic_model = ?
+       WHERE id = ?`,
+    )
+    .run(topic, confidence, model, id);
+}
+
+export function listUnclassifiedHeadlines(limit: number): HeadlineRow[] {
+  return getDb()
+    .prepare(
+      `SELECT * FROM headlines
+       WHERE topic IS NULL
+       ORDER BY ingested_at DESC
+       LIMIT ?`,
+    )
+    .all(limit) as HeadlineRow[];
 }

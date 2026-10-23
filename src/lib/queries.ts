@@ -12,6 +12,7 @@ export type Headline = {
   publishedAt: number;
   hnUrl: string | null;
   sourceSlug: string;
+  topic: string | null;
 };
 
 export type SourceColumn = {
@@ -26,6 +27,7 @@ function mapRow(row: HeadlineRow): Headline {
     publishedAt: row.published_at,
     hnUrl: row.hn_url,
     sourceSlug: row.source_slug,
+    topic: row.topic ?? null,
   };
 }
 
@@ -70,19 +72,64 @@ export function getFeed(opts: {
   limit: number;
   hours: number;
 }): Headline[] {
-  const sources = sourcesForTopic(opts.topic);
-  if (sources.length === 0) return [];
-  const slugs = sources.map((s) => s.slug);
   const since = Date.now() - opts.hours * 60 * 60 * 1000;
+
+  if (opts.topic === "all") {
+    const rows = getDb()
+      .prepare(
+        `SELECT * FROM headlines
+         WHERE published_at >= ?
+         ORDER BY published_at DESC
+         LIMIT ?`,
+      )
+      .all(since, opts.limit) as HeadlineRow[];
+    return rows.map(mapRow);
+  }
+
+  if (opts.topic === "home") {
+    const sources = sourcesForTopic("home");
+    if (sources.length === 0) return [];
+    const slugs = sources.map((s) => s.slug);
+    const placeholders = slugs.map(() => "?").join(",");
+    const rows = getDb()
+      .prepare(
+        `SELECT * FROM headlines
+         WHERE source_slug IN (${placeholders}) AND published_at >= ?
+         ORDER BY published_at DESC
+         LIMIT ?`,
+      )
+      .all(...slugs, since, opts.limit) as HeadlineRow[];
+    return rows.map(mapRow);
+  }
+
+  // Classified into topic T, plus unclassified from sources tagged with T
+  const sources = sourcesForTopic(opts.topic);
+  const slugs = sources.map((s) => s.slug);
+  if (slugs.length === 0) {
+    const rows = getDb()
+      .prepare(
+        `SELECT * FROM headlines
+         WHERE topic = ? AND published_at >= ?
+         ORDER BY published_at DESC
+         LIMIT ?`,
+      )
+      .all(opts.topic, since, opts.limit) as HeadlineRow[];
+    return rows.map(mapRow);
+  }
+
   const placeholders = slugs.map(() => "?").join(",");
   const rows = getDb()
     .prepare(
       `SELECT * FROM headlines
-       WHERE source_slug IN (${placeholders}) AND published_at >= ?
+       WHERE published_at >= ?
+         AND (
+           topic = ?
+           OR (topic IS NULL AND source_slug IN (${placeholders}))
+         )
        ORDER BY published_at DESC
        LIMIT ?`,
     )
-    .all(...slugs, since, opts.limit) as HeadlineRow[];
+    .all(since, opts.topic, ...slugs, opts.limit) as HeadlineRow[];
   return rows.map(mapRow);
 }
 

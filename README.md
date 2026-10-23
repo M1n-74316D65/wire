@@ -21,9 +21,15 @@ Open [http://localhost:3000](http://localhost:3000). Production: [https://news.m
 | `AI_BASE_URL` | no | Default `https://api.openai.com/v1` |
 | `AI_MODEL` | no | Default `gpt-4o-mini` |
 | `SUMMARIZE_PASSWORD` | for `ai` summaries | Password before summarizing |
+| `DECISION_API_KEY` | for topic routing | System One decision API key |
+| `DECISION_BASE_URL` | no | Default OpenCode System One endpoint |
+| `DECISION_MODEL` | no | Default `jev-1.13-free` |
+| `DECISION_MIN_CONFIDENCE` | no | Default `0.45` — below this, keep source topics |
 | `CRON_SECRET` | recommended in prod | Shared secret for `/api/ingest` |
 
 Without `AI_API_KEY` and `SUMMARIZE_PASSWORD`, the app still runs; `ai` links are hidden.
+
+Without `DECISION_API_KEY`, ingest skips classification and sections stay **source-based**. With it, new headlines get a primary topic from a System One decision model (`choice`). Swap `DECISION_BASE_URL` / `DECISION_MODEL` for OpenCode free, TypeSafe, MixRoute, or a local System One server — same wire format.
 
 ## Deploy (Vercel)
 
@@ -44,6 +50,10 @@ AI_API_KEY=
 AI_BASE_URL=https://api.openai.com/v1
 AI_MODEL=gpt-4o-mini
 SUMMARIZE_PASSWORD=
+DECISION_API_KEY=
+DECISION_BASE_URL=https://opencode.ai/inference/systemone/v1/systemone
+DECISION_MODEL=jev-1.13-free
+DECISION_MIN_CONFIDENCE=0.45
 CRON_SECRET=
 ```
 
@@ -82,7 +92,7 @@ Production hostname: **`news.m1n.land`**
 | `/summarize` | AI article summary (password-gated) |
 | `/api` | JSON home snapshot |
 | `/api/topic/{slug}` | JSON topic snapshot |
-| `/api/ingest` | Refresh feeds |
+| `/api/ingest` | Refresh feeds (+ optional topic classification) |
 
 Query params: `?limit=5|10|15|25|50`, `?hours=1|3|6|12|24`.
 

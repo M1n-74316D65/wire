@@ -1,6 +1,13 @@
 import Parser from "rss-parser";
-import { getDb, setLastIngestAt } from "./db";
-import { SOURCES } from "./sources";
+import { classifyHeadline } from "./classify-topic";
+import {
+  getDb,
+  listUnclassifiedHeadlines,
+  setHeadlineTopic,
+  setLastIngestAt,
+} from "./db";
+import { decisionConfigured } from "./env";
+import { getSource, SOURCES } from "./sources";
 
 const parser = new Parser({
   timeout: 15_000,
@@ -16,17 +23,18 @@ export type IngestResult = {
   error?: string;
 };
 
+const CLASSIFY_LIMIT = 40;
+const CLASSIFY_CONCURRENCY = 3;
+
 function extractHnUrl(item: Parser.Item): string | null {
   const candidates = [
     item.link,
     ...(item.guid ? [item.guid] : []),
-    // hnrss puts discussion in comments field sometimes
     (item as { comments?: string }).comments,
   ].filter(Boolean) as string[];
   for (const c of candidates) {
     if (c.includes("news.ycombinator.com/item")) return c;
   }
-  // hnrss: link is article, comments is HN
   const comments = (item as { comments?: string }).comments;
   if (comments?.includes("news.ycombinator.com")) return comments;
   return null;
@@ -81,15 +89,67 @@ async function ingestSource(slug: string, feedUrl: string): Promise<IngestResult
   }
 }
 
+async function classifyUnclassified(): Promise<{
+  classified: number;
+  skipped: number;
+  errors: number;
+}> {
+  if (!decisionConfigured()) {
+    return { classified: 0, skipped: 0, errors: 0 };
+  }
+
+  const rows = listUnclassifiedHeadlines(CLASSIFY_LIMIT);
+  let classified = 0;
+  let skipped = 0;
+  let errors = 0;
+
+  for (let i = 0; i < rows.length; i += CLASSIFY_CONCURRENCY) {
+    const batch = rows.slice(i, i + CLASSIFY_CONCURRENCY);
+    const outcomes = await Promise.all(
+      batch.map(async (row): Promise<"ok" | "skip" | "err"> => {
+        const source = getSource(row.source_slug);
+        if (!source) return "skip";
+        try {
+          const result = await classifyHeadline({
+            title: row.title,
+            sourceName: source.name,
+            sourceTopics: source.topics,
+          });
+          if (!result) return "skip";
+          setHeadlineTopic(
+            row.id,
+            result.topic,
+            result.confidence,
+            result.model,
+          );
+          return "ok";
+        } catch {
+          return "err";
+        }
+      }),
+    );
+    for (const o of outcomes) {
+      if (o === "ok") classified += 1;
+      else if (o === "skip") skipped += 1;
+      else errors += 1;
+    }
+  }
+
+  return { classified, skipped, errors };
+}
+
 export async function ingestAll(options?: {
   slugs?: string[];
-}): Promise<{ results: IngestResult[]; at: number }> {
+}): Promise<{
+  results: IngestResult[];
+  at: number;
+  classification: { classified: number; skipped: number; errors: number };
+}> {
   const list = options?.slugs
     ? SOURCES.filter((s) => options.slugs!.includes(s.slug))
     : SOURCES;
 
   const results: IngestResult[] = [];
-  // modest concurrency
   const concurrency = 6;
   for (let i = 0; i < list.length; i += concurrency) {
     const batch = list.slice(i, i + concurrency);
@@ -99,7 +159,9 @@ export async function ingestAll(options?: {
     results.push(...batchResults);
   }
 
+  const classification = await classifyUnclassified();
+
   const at = Date.now();
   setLastIngestAt(at);
-  return { results, at };
+  return { results, at, classification };
 }
