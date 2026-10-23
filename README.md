@@ -57,7 +57,7 @@ Hit ingest once after deploy:
 curl -H "Authorization: Bearer $CRON_SECRET" https://news.m1n.land/api/ingest
 ```
 
-Optional: Vercel Cron → path `/api/ingest`, schedule e.g. `*/30 * * * *`, and send header `Authorization: Bearer <CRON_SECRET>` (configure in `vercel.json` / project crons + protect the route with `CRON_SECRET`).
+Cron (`vercel.json`): `*/30 7-16 * * 1-5` — every 30 minutes, weekdays only, **07:00–16:59 UTC**. That covers roughly **09:00–18:00 Europe/Madrid** in summer and **08:00–17:00** in winter (work desk hours). Protect `/api/ingest` with `CRON_SECRET`.
 
 ### Custom domain
 
