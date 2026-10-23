@@ -102,7 +102,8 @@ export function getFeed(opts: {
     return rows.map(mapRow);
   }
 
-  // Classified into topic T, plus unclassified from sources tagged with T
+  // In section T: model said T, OR the headline's source is tagged with T
+  // (so Xataka → tech still shows under Spain; El País → politics still under Spain)
   const sources = sourcesForTopic(opts.topic);
   const slugs = sources.map((s) => s.slug);
   if (slugs.length === 0) {
@@ -124,7 +125,7 @@ export function getFeed(opts: {
        WHERE published_at >= ?
          AND (
            topic = ?
-           OR (topic IS NULL AND source_slug IN (${placeholders}))
+           OR source_slug IN (${placeholders})
          )
        ORDER BY published_at DESC
        LIMIT ?`,

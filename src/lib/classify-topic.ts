@@ -2,15 +2,16 @@ import { decide, type ChoiceAnswer } from "./decision";
 import { getDecisionConfig } from "./env";
 import { TOPICS, type Topic } from "./sources";
 
+/** Short criteria — keeps prompt tokens low. */
 const TOPIC_CRITERIA: Record<Topic, string> = {
-  tech: "Software, hardware, internet, startups, AI, gadgets, cybersecurity.",
-  news: "General current events that do not fit a tighter section; world wire stories.",
-  spain: "Spain or Spanish politics/society/economy as the main subject (not merely a Spanish outlet).",
-  business: "Markets, companies, finance, trade, economy, labor as the main subject.",
-  science: "Research, space, climate science, medicine, biology, physics discoveries.",
-  gaming: "Video games, esports, game industry, consoles, game studios.",
-  culture: "Arts, film, music, books, TV, design, cultural criticism.",
-  politics: "Government, elections, policy, diplomacy, political parties (any country).",
+  tech: "Software, AI, gadgets, internet, startups.",
+  news: "General current events / wire stories.",
+  spain: "Spain as the main subject (not just a Spanish outlet).",
+  business: "Markets, companies, finance, economy.",
+  science: "Research, space, medicine, discoveries.",
+  gaming: "Video games, esports, game industry.",
+  culture: "Arts, film, music, books, TV.",
+  politics: "Government, elections, policy, parties.",
 };
 
 export type TopicClassification = {
@@ -21,7 +22,23 @@ export type TopicClassification = {
 
 const VALID = new Set<string>(TOPICS.map((t) => t.slug));
 
-/** Classify a headline into one Topic via decision-model choice. */
+/** Sources with a single topic never need the model. */
+export function topicFromSourceAlone(topics: Topic[]): TopicClassification | null {
+  if (topics.length !== 1) return null;
+  return { topic: topics[0], confidence: 1, model: "source" };
+}
+
+export function fallbackTopic(topics: Topic[]): TopicClassification | null {
+  if (topics.length === 0) return null;
+  // Prefer a specific section over the catch-all "news"
+  const preferred = topics.find((t) => t !== "news") ?? topics[0];
+  return { topic: preferred, confidence: 0, model: "source-fallback" };
+}
+
+/**
+ * Classify via decision model. Only call when the source has 2+ topics
+ * (ambiguous routing). Criteria are limited to those topics to save tokens.
+ */
 export async function classifyHeadline(opts: {
   title: string;
   sourceName: string;
@@ -30,22 +47,26 @@ export async function classifyHeadline(opts: {
   const cfg = getDecisionConfig();
   if (!cfg) return null;
 
+  const fromSource = topicFromSourceAlone(opts.sourceTopics);
+  if (fromSource) return fromSource;
+
+  const options =
+    opts.sourceTopics.length >= 2
+      ? opts.sourceTopics
+      : (TOPICS.map((t) => t.slug) as Topic[]);
+
   const criteria: Record<string, string> = {};
-  for (const t of TOPICS) {
-    criteria[t.slug] = TOPIC_CRITERIA[t.slug];
+  for (const slug of options) {
+    criteria[slug] = TOPIC_CRITERIA[slug];
   }
 
-  const state = {
-    title: opts.title,
-    source: opts.sourceName,
-    source_topics: opts.sourceTopics,
-  };
+  // Compact state — title is enough; source name is a light hint
+  const state = `${opts.sourceName}: ${opts.title}`;
 
   const result = await decide(state, {
     topic: {
       type: "choice",
-      instructions:
-        "Pick the single best section for this headline on a personal news desk. Prefer the article subject over the outlet's country.",
+      instructions: "Best desk section for this headline. Prefer subject over outlet country.",
       criteria,
     },
   });

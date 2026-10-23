@@ -41,9 +41,9 @@ export function getDecisionConfig(): DecisionConfig | null {
     apiKey,
     baseURL: (
       process.env.DECISION_BASE_URL?.trim() ||
-      "https://opencode.ai/inference/systemone/v1/systemone"
+      "https://openrouter.ai/api/alpha/decisions"
     ).replace(/\/$/, ""),
-    model: process.env.DECISION_MODEL?.trim() || "jev-1.13-free",
+    model: process.env.DECISION_MODEL?.trim() || "inception/mercury-decide:free",
     minConfidence: Number.isFinite(minRaw) && minRaw > 0 ? minRaw : 0.45,
   };
 }

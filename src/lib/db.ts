@@ -115,6 +115,25 @@ export function setHeadlineTopic(
     .run(topic, confidence, model, id);
 }
 
+export function countUnclassifiedHeadlines(): number {
+  const row = getDb()
+    .prepare(`SELECT COUNT(*) AS n FROM headlines WHERE topic IS NULL`)
+    .get() as { n: number };
+  return row.n;
+}
+
+export function countUnclassifiedForSources(sourceSlugs: string[]): number {
+  if (sourceSlugs.length === 0) return 0;
+  const placeholders = sourceSlugs.map(() => "?").join(",");
+  const row = getDb()
+    .prepare(
+      `SELECT COUNT(*) AS n FROM headlines
+       WHERE topic IS NULL AND source_slug IN (${placeholders})`,
+    )
+    .get(...sourceSlugs) as { n: number };
+  return row.n;
+}
+
 export function listUnclassifiedHeadlines(limit: number): HeadlineRow[] {
   return getDb()
     .prepare(
@@ -124,4 +143,21 @@ export function listUnclassifiedHeadlines(limit: number): HeadlineRow[] {
        LIMIT ?`,
     )
     .all(limit) as HeadlineRow[];
+}
+
+/** Unclassified rows from specific sources (e.g. multi-topic feeds only). */
+export function listUnclassifiedForSources(
+  sourceSlugs: string[],
+  limit: number,
+): HeadlineRow[] {
+  if (sourceSlugs.length === 0 || limit <= 0) return [];
+  const placeholders = sourceSlugs.map(() => "?").join(",");
+  return getDb()
+    .prepare(
+      `SELECT * FROM headlines
+       WHERE topic IS NULL AND source_slug IN (${placeholders})
+       ORDER BY ingested_at DESC
+       LIMIT ?`,
+    )
+    .all(...sourceSlugs, limit) as HeadlineRow[];
 }
