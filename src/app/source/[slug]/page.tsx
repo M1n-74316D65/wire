@@ -3,7 +3,7 @@ import { HeadlineList } from "@/components/HeadlineList";
 import { PageChrome } from "@/components/PageChrome";
 import { getSourceColumn, lastUpdatedLabel } from "@/lib/queries";
 import { getTheme } from "@/lib/theme";
-import { parseHours, parseLimit } from "@/lib/time";
+import { nowMs, parseHours, parseLimit } from "@/lib/time";
 
 export const dynamic = "force-dynamic";
 
@@ -21,7 +21,7 @@ export default async function SourcePage({ params, searchParams }: Props) {
   if (!column) notFound();
 
   const theme = await getTheme();
-  const now = Date.now();
+  const now = nowMs();
 
   return (
     <PageChrome

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { PageChrome } from "@/components/PageChrome";
 import { SummarizeForm } from "@/components/SummarizeForm";
 import { SummaryBody } from "@/components/SummaryBody";
@@ -102,7 +103,7 @@ export default async function SummarizePage({ searchParams }: Props) {
               </span>
               <nav className="brief-card__actions">
                 <a href={regenerateHref}>Rewrite</a>
-                <a href="/">Desk</a>
+                <Link href="/">Desk</Link>
               </nav>
             </footer>
           </article>

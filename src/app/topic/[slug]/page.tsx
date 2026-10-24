@@ -4,7 +4,7 @@ import { PageChrome } from "@/components/PageChrome";
 import { getFeed, lastUpdatedLabel } from "@/lib/queries";
 import { TOPICS, type Topic } from "@/lib/sources";
 import { getTheme } from "@/lib/theme";
-import { parseHours, parseLimit } from "@/lib/time";
+import { nowMs, parseHours, parseLimit } from "@/lib/time";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +25,7 @@ export default async function TopicPage({ params, searchParams }: Props) {
   const topic = slug as Topic | "all";
   const theme = await getTheme();
   const headlines = getFeed({ topic, limit, hours });
-  const now = Date.now();
+  const now = nowMs();
   const title =
     slug === "all"
       ? "Everything"

@@ -1,4 +1,8 @@
-export function relativeTime(publishedAtMs: number, now = Date.now()): string {
+export function nowMs(): number {
+  return Date.now();
+}
+
+export function relativeTime(publishedAtMs: number, now = nowMs()): string {
   const diff = Math.max(0, now - publishedAtMs);
   const mins = Math.floor(diff / 60_000);
   if (mins < 60) return `${Math.max(1, mins)}m`;

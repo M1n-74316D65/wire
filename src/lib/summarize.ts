@@ -28,25 +28,35 @@ Formatting:
 - Bullets must start with "- ".
 - No preamble ("Here is…", "Summary:", "En resumen:").
 - Do not repeat the title as a heading.
-- Keep the whole brief under ~180 words.`;
+- Keep the whole brief under ~180 words.
+
+Facts:
+- Separate the central event from background. Include background only when the event is unclear without it.
+- Prioritize concrete developments, decisions, consequences, and material later updates over repeated context.
+- Treat omission markers such as "[...]" as missing source text, not as claims in the article.`;
+
+export const SUMMARY_VERSION = 2;
 
 export function getCachedSummary(url: string): SummaryRow | null {
   const row = getDb()
-    .prepare("SELECT url, title, summary, model, created_at FROM summaries WHERE url = ?")
-    .get(url) as SummaryRow | undefined;
+    .prepare(
+      "SELECT url, title, summary, model, created_at FROM summaries WHERE url = ? AND version = ?",
+    )
+    .get(url, SUMMARY_VERSION) as SummaryRow | undefined;
   return row ?? null;
 }
 
 export function saveSummary(row: Omit<SummaryRow, "created_at"> & { created_at?: number }) {
   getDb()
     .prepare(
-      `INSERT INTO summaries (url, title, summary, model, created_at)
-       VALUES (@url, @title, @summary, @model, @created_at)
+      `INSERT INTO summaries (url, title, summary, model, created_at, version)
+       VALUES (@url, @title, @summary, @model, @created_at, @version)
        ON CONFLICT(url) DO UPDATE SET
          title = excluded.title,
          summary = excluded.summary,
          model = excluded.model,
-         created_at = excluded.created_at`,
+         created_at = excluded.created_at,
+         version = excluded.version`,
     )
     .run({
       url: row.url,
@@ -54,6 +64,7 @@ export function saveSummary(row: Omit<SummaryRow, "created_at"> & { created_at?:
       summary: row.summary,
       model: row.model,
       created_at: row.created_at ?? Date.now(),
+      version: SUMMARY_VERSION,
     });
 }
 

@@ -57,8 +57,6 @@ export function getDb(): Database.Database {
       ON headlines(source_slug, published_at DESC);
     CREATE INDEX IF NOT EXISTS idx_headlines_pub
       ON headlines(published_at DESC);
-    CREATE INDEX IF NOT EXISTS idx_headlines_topic_pub
-      ON headlines(topic, published_at DESC);
     CREATE TABLE IF NOT EXISTS meta (
       key TEXT PRIMARY KEY,
       value TEXT NOT NULL
@@ -68,7 +66,8 @@ export function getDb(): Database.Database {
       title TEXT,
       summary TEXT NOT NULL,
       model TEXT NOT NULL,
-      created_at INTEGER NOT NULL
+      created_at INTEGER NOT NULL,
+      version INTEGER NOT NULL DEFAULT 1
     );
   `);
 
@@ -76,6 +75,7 @@ export function getDb(): Database.Database {
   ensureColumn(db, "headlines", "topic", "topic TEXT");
   ensureColumn(db, "headlines", "topic_confidence", "topic_confidence REAL");
   ensureColumn(db, "headlines", "topic_model", "topic_model TEXT");
+  ensureColumn(db, "summaries", "version", "version INTEGER NOT NULL DEFAULT 1");
   db.exec(
     `CREATE INDEX IF NOT EXISTS idx_headlines_topic_pub
      ON headlines(topic, published_at DESC)`,

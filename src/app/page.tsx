@@ -2,7 +2,7 @@ import { FeedList } from "@/components/FeedList";
 import { PageChrome } from "@/components/PageChrome";
 import { getFeed, lastUpdatedLabel } from "@/lib/queries";
 import { getTheme } from "@/lib/theme";
-import { parseHours, parseLimit } from "@/lib/time";
+import { nowMs, parseHours, parseLimit } from "@/lib/time";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +16,7 @@ export default async function HomePage({ searchParams }: Props) {
   const hours = parseHours(sp.hours);
   const theme = await getTheme();
   const headlines = getFeed({ topic: "home", limit, hours });
-  const now = Date.now();
+  const now = nowMs();
 
   return (
     <PageChrome

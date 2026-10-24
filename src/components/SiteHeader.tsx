@@ -1,5 +1,6 @@
+import Link from "next/link";
 import { setThemeAction } from "@/app/actions";
-import { formatLastUpdated } from "@/lib/time";
+import { formatLastUpdated, nowMs } from "@/lib/time";
 import type { Theme } from "@/lib/theme";
 
 function ThemeOption({
@@ -34,11 +35,11 @@ export function SiteHeader({
       <div className="site-header__top">
         <div>
           <h1 className="brand">
-            <a href="/">wire</a>
+            <Link href="/">wire</Link>
           </h1>
           <p className="tagline">
             A quiet desk for the feeds you keep. Pulled{" "}
-            <time dateTime={new Date(lastUpdated ?? Date.now()).toISOString()}>
+            <time dateTime={new Date(lastUpdated ?? nowMs()).toISOString()}>
               {formatLastUpdated(lastUpdated)}
             </time>
             .
