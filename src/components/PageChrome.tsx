@@ -1,6 +1,7 @@
 import { Filters } from "@/components/Filters";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteNav } from "@/components/SiteNav";
+import { SourceNav } from "@/components/SourceNav";
 import { Shell } from "@/components/Shell";
 import type { Theme } from "@/lib/theme";
 
@@ -31,6 +32,7 @@ export function PageChrome({
       <div className="desk">
         <aside className="desk__rail">
           <SiteNav active={activeNav} />
+          <SourceNav active={activeNav} />
         </aside>
         <div className="desk__main">
           {title ? <h2 className="desk__title">{title}</h2> : null}

@@ -27,6 +27,7 @@ export default async function SourcePage({ params, searchParams }: Props) {
     <PageChrome
       theme={theme}
       lastUpdated={lastUpdatedLabel()}
+      activeNav={slug}
       basePath={`/source/${slug}`}
       limit={limit}
       hours={hours}
