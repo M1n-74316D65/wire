@@ -78,7 +78,10 @@ function fitArticleText(blocks: string[]): string {
 
     for (const position of positions) {
       const separator = position + next === previous + 1 ? "\n" : OMISSION;
-      const candidate = text + separator + rest[position];
+      const available = MAX_CHARS - text.length - separator.length;
+      if (available <= 0) continue;
+      const block = position === rest.length - 1 ? rest[position].slice(-available) : rest[position];
+      const candidate = text + separator + block;
       if (candidate.length > MAX_CHARS) continue;
       text = candidate;
       previous = position + next;

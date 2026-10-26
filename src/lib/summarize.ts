@@ -28,7 +28,7 @@ Formatting:
 - Bullets must start with "- ".
 - No preamble ("Here is…", "Summary:", "En resumen:").
 - Do not repeat the title as a heading.
-- Keep the whole brief under ~180 words.
+- Keep the whole brief under ~250 words.
 
 Facts:
 - Separate the central event from background. Include background only when the event is unclear without it.
