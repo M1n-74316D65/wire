@@ -931,13 +931,37 @@ html[data-theme="dark"] {
   }
 
   .tag {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0.3rem 0.8rem;
+    margin: -0.3rem 0;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--ios-accent) 12%, transparent);
     font-family: var(--ios-font);
-    font-size: 0.78rem;
+    font-size: 0.82rem;
+    font-weight: 600;
     color: var(--ios-accent);
+    text-decoration: none;
+  }
+
+  .tag:visited {
+    color: var(--ios-accent);
+  }
+
+  .tag:hover {
+    color: var(--ios-accent);
+    background: color-mix(in srgb, var(--ios-accent) 20%, transparent);
+    text-decoration: none;
   }
 
   .tag--ai {
     color: var(--ios-accent);
+  }
+
+  .feed__meta {
+    align-items: center;
+    margin-top: 0.35rem;
   }
 
   .empty-state,
