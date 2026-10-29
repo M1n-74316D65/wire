@@ -16,7 +16,7 @@ async function run(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { results, at, classification } = await ingestAll();
+  const { results, at } = await ingestAll();
   const ok = results.filter((r) => !r.error).length;
   const fail = results.filter((r) => r.error);
   return NextResponse.json({
@@ -24,7 +24,6 @@ async function run(req: Request) {
     sourcesOk: ok,
     sourcesFailed: fail.length,
     inserted: results.reduce((sum, r) => sum + r.inserted, 0),
-    classification,
     failures: fail,
   });
 }

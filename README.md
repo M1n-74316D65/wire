@@ -21,17 +21,11 @@ Open [http://localhost:3000](http://localhost:3000). Production: [https://news.m
 | `AI_BASE_URL` | no | Default `https://api.openai.com/v1` |
 | `AI_MODEL` | no | Default `gpt-4o-mini` |
 | `SUMMARIZE_PASSWORD` | for `ai` summaries | Password before summarizing |
-| `DECISION_API_KEY` | for topic routing | OpenRouter (or other System One) API key |
-| `DECISION_BASE_URL` | no | Default `https://openrouter.ai/api/alpha/decisions` |
-| `DECISION_MODEL` | no | Default `inception/mercury-decide:free` |
-| `DECISION_MIN_CONFIDENCE` | no | Default `0.45` — below this, keep source topics |
-| `DECISION_CLASSIFY_LIMIT` | no | Default `20` model calls per ingest (multi-topic sources only) |
-| `DECISION_CLASSIFY_CONCURRENCY` | no | Default `2` parallel decision calls |
 | `CRON_SECRET` | recommended in prod | Shared secret for `/api/ingest` |
 
 Without `AI_API_KEY` and `SUMMARIZE_PASSWORD`, the app still runs; `ai` links are hidden.
 
-Without `DECISION_API_KEY`, single-topic sources still get a local topic; multi-topic sources stay source-based. With a key, the model only runs on **ambiguous feeds** (2+ topics); single-topic feeds are labeled for free. Low-confidence / errors fall back once to a source topic so the same headline is never re-billed. Default model example: OpenRouter `inception/mercury-decide:free` (swap via `DECISION_*`).
+Topics are source-based: each headline inherits the topic of its feed (single-topic feeds map 1:1; multi-topic feeds prefer a specific section over the catch-all `news`). No external classification model is used.
 
 ## Deploy (Vercel)
 
@@ -52,12 +46,6 @@ AI_API_KEY=
 AI_BASE_URL=https://api.openai.com/v1
 AI_MODEL=gpt-4o-mini
 SUMMARIZE_PASSWORD=
-DECISION_API_KEY=
-DECISION_BASE_URL=https://openrouter.ai/api/alpha/decisions
-DECISION_MODEL=inception/mercury-decide:free
-DECISION_MIN_CONFIDENCE=0.45
-DECISION_CLASSIFY_LIMIT=20
-DECISION_CLASSIFY_CONCURRENCY=2
 CRON_SECRET=
 ```
 
@@ -72,8 +60,6 @@ curl -H "Authorization: Bearer $CRON_SECRET" https://news.m1n.land/api/ingest
 ```
 
 Cron (`vercel.json`): `*/30 7-16 * * 1-5` — every 30 minutes, weekdays only, **07:00–16:59 UTC** (~09:00–18:00 Europe/Madrid in summer). Protect `/api/ingest` with `CRON_SECRET`.
-
-Classification is thrifty: ~20 model calls/ingest max (~40 if backlog is huge), only for multi-topic sources, compact prompts, no retries on low confidence.
 
 ### Custom domain
 
@@ -98,7 +84,7 @@ Production hostname: **`news.m1n.land`**
 | `/summarize` | AI article summary (password-gated) |
 | `/api` | JSON home snapshot |
 | `/api/topic/{slug}` | JSON topic snapshot |
-| `/api/ingest` | Refresh feeds (+ optional topic classification) |
+| `/api/ingest` | Refresh feeds |
 
 Query params: `?limit=5|10|15|25|50`, `?hours=1|3|6|12|24`.
 

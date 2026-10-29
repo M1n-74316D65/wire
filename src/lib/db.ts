@@ -11,8 +11,6 @@ export type HeadlineRow = {
   hn_url: string | null;
   ingested_at: number;
   topic: string | null;
-  topic_confidence: number | null;
-  topic_model: string | null;
 };
 
 const DATA_DIR = path.join(process.cwd(), "data");
@@ -49,8 +47,6 @@ export function getDb(): Database.Database {
       hn_url TEXT,
       ingested_at INTEGER NOT NULL,
       topic TEXT,
-      topic_confidence REAL,
-      topic_model TEXT,
       UNIQUE(source_slug, url)
     );
     CREATE INDEX IF NOT EXISTS idx_headlines_source_pub
@@ -73,8 +69,6 @@ export function getDb(): Database.Database {
 
   // Existing DBs created before topic columns
   ensureColumn(db, "headlines", "topic", "topic TEXT");
-  ensureColumn(db, "headlines", "topic_confidence", "topic_confidence REAL");
-  ensureColumn(db, "headlines", "topic_model", "topic_model TEXT");
   ensureColumn(db, "summaries", "version", "version INTEGER NOT NULL DEFAULT 1");
   db.exec(
     `CREATE INDEX IF NOT EXISTS idx_headlines_topic_pub
@@ -100,64 +94,4 @@ export function setLastIngestAt(ts: number) {
     .run(String(ts));
 }
 
-export function setHeadlineTopic(
-  id: number,
-  topic: string,
-  confidence: number,
-  model: string,
-) {
-  getDb()
-    .prepare(
-      `UPDATE headlines
-       SET topic = ?, topic_confidence = ?, topic_model = ?
-       WHERE id = ?`,
-    )
-    .run(topic, confidence, model, id);
-}
 
-export function countUnclassifiedHeadlines(): number {
-  const row = getDb()
-    .prepare(`SELECT COUNT(*) AS n FROM headlines WHERE topic IS NULL`)
-    .get() as { n: number };
-  return row.n;
-}
-
-export function countUnclassifiedForSources(sourceSlugs: string[]): number {
-  if (sourceSlugs.length === 0) return 0;
-  const placeholders = sourceSlugs.map(() => "?").join(",");
-  const row = getDb()
-    .prepare(
-      `SELECT COUNT(*) AS n FROM headlines
-       WHERE topic IS NULL AND source_slug IN (${placeholders})`,
-    )
-    .get(...sourceSlugs) as { n: number };
-  return row.n;
-}
-
-export function listUnclassifiedHeadlines(limit: number): HeadlineRow[] {
-  return getDb()
-    .prepare(
-      `SELECT * FROM headlines
-       WHERE topic IS NULL
-       ORDER BY ingested_at DESC
-       LIMIT ?`,
-    )
-    .all(limit) as HeadlineRow[];
-}
-
-/** Unclassified rows from specific sources (e.g. multi-topic feeds only). */
-export function listUnclassifiedForSources(
-  sourceSlugs: string[],
-  limit: number,
-): HeadlineRow[] {
-  if (sourceSlugs.length === 0 || limit <= 0) return [];
-  const placeholders = sourceSlugs.map(() => "?").join(",");
-  return getDb()
-    .prepare(
-      `SELECT * FROM headlines
-       WHERE topic IS NULL AND source_slug IN (${placeholders})
-       ORDER BY ingested_at DESC
-       LIMIT ?`,
-    )
-    .all(...sourceSlugs, limit) as HeadlineRow[];
-}

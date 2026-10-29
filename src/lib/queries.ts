@@ -102,35 +102,22 @@ export function getFeed(opts: {
     return rows.map(mapRow);
   }
 
-  // In section T: model said T, OR the headline's source is tagged with T
+  // In section T: the headline's source is tagged with T
   // (so Xataka → tech still shows under Spain; El País → politics still under Spain)
   const sources = sourcesForTopic(opts.topic);
   const slugs = sources.map((s) => s.slug);
-  if (slugs.length === 0) {
-    const rows = getDb()
-      .prepare(
-        `SELECT * FROM headlines
-         WHERE topic = ? AND published_at >= ?
-         ORDER BY published_at DESC
-         LIMIT ?`,
-      )
-      .all(opts.topic, since, opts.limit) as HeadlineRow[];
-    return rows.map(mapRow);
-  }
+  if (slugs.length === 0) return [];
 
   const placeholders = slugs.map(() => "?").join(",");
   const rows = getDb()
     .prepare(
       `SELECT * FROM headlines
        WHERE published_at >= ?
-         AND (
-           topic = ?
-           OR source_slug IN (${placeholders})
-         )
+         AND source_slug IN (${placeholders})
        ORDER BY published_at DESC
        LIMIT ?`,
     )
-    .all(since, opts.topic, ...slugs, opts.limit) as HeadlineRow[];
+    .all(since, ...slugs, opts.limit) as HeadlineRow[];
   return rows.map(mapRow);
 }
 

@@ -360,6 +360,23 @@ export function getSource(slug: string): Source | undefined {
   return SOURCES.find((s) => s.slug === slug);
 }
 
+/** Sources with a single topic never need anything beyond the source. */
+export function topicFromSourceAlone(topics: Topic[]): Topic | null {
+  if (topics.length !== 1) return null;
+  return topics[0];
+}
+
+/** Multi-topic sources: prefer a specific section over the catch-all "news". */
+export function fallbackTopic(topics: Topic[]): Topic | null {
+  if (topics.length === 0) return null;
+  return topics.find((t) => t !== "news") ?? topics[0];
+}
+
+/** Topic assigned at ingest time, purely from the source's tags. */
+export function topicForSource(source: Source): Topic | null {
+  return topicFromSourceAlone(source.topics) ?? fallbackTopic(source.topics);
+}
+
 export function sourcesForTopic(topic: Topic | "all" | "home"): Source[] {
   if (topic === "home") return SOURCES.filter((s) => s.home);
   if (topic === "all") return SOURCES;
