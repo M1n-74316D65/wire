@@ -1,8 +1,9 @@
 import { Filters } from "@/components/Filters";
+import { Shell } from "@/components/Shell";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteNav } from "@/components/SiteNav";
 import { SourceNav } from "@/components/SourceNav";
-import { Shell } from "@/components/Shell";
+import { TabBar } from "@/components/TabBar";
 import type { Theme } from "@/lib/theme";
 
 export function PageChrome({
@@ -42,6 +43,7 @@ export function PageChrome({
           {children}
         </div>
       </div>
+      <TabBar active={activeNav} />
     </Shell>
   );
 }
