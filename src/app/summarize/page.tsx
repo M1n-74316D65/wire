@@ -7,6 +7,7 @@ import { lastUpdatedLabel } from "@/lib/queries";
 import { getCachedSummary, summarizeUrl } from "@/lib/summarize";
 import { isSummarizeUnlocked } from "@/lib/summarize-auth";
 import { getTheme } from "@/lib/theme";
+import { SPAIN_TIME_ZONE } from "@/lib/time";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -95,9 +96,10 @@ export default async function SummarizePage({ searchParams }: Props) {
               <span className="meta meta--wrap">
                 {model ? model : null}
                 {createdAt
-                  ? ` · ${new Date(createdAt).toLocaleString(undefined, {
+                  ? ` · ${new Date(createdAt).toLocaleString("es-ES", {
                       dateStyle: "medium",
                       timeStyle: "short",
+                      timeZone: SPAIN_TIME_ZONE,
                     })}`
                   : null}
               </span>
