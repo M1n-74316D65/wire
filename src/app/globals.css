@@ -977,8 +977,48 @@ html[data-theme="dark"] {
     background: color-mix(in srgb, var(--ios-accent) 20%, transparent);
   }
 
+  .tag__icon {
+    display: none;
+  }
+
+  /* AI action: solid iOS-style button, pinned to the right of the row */
   .tag--ai {
-    color: var(--ios-accent);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    min-height: 2.75rem;
+    padding: 0.45rem 0.9rem;
+    margin: 0;
+    border-radius: 999px;
+    background: var(--ios-accent);
+    color: #fff;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    box-shadow: 0 1px 3px rgba(10, 132, 255, 0.35);
+  }
+
+  .tag--ai:visited {
+    color: #fff;
+  }
+
+  .tag--ai:active {
+    opacity: 0.75;
+    background: var(--ios-accent);
+    box-shadow: none;
+  }
+
+  .tag--ai .tag__icon {
+    display: block;
+    width: 0.95rem;
+    height: 0.95rem;
+    flex: none;
+  }
+
+  .feed__item .feed__meta {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 0.375rem;
   }
 
   .empty-state,
