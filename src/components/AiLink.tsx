@@ -31,7 +31,16 @@ export function AiLink({ url, title }: { url: string; title: string }) {
         })();
       }}
     >
-      ai
+      <svg
+        className="tag__icon"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        aria-hidden="true"
+      >
+        <path d="M12 2.5 13.9 8.6 20 10.5 13.9 12.4 12 18.5 10.1 12.4 4 10.5 10.1 8.6 12 2.5Z" />
+        <path d="M19 15.5 19.9 18.1 22.5 19 19.9 19.9 19 22.5 18.1 19.9 15.5 19 18.1 18.1 19 15.5Z" />
+      </svg>
+      <span className="tag__label">ai</span>
     </a>
   );
 }
