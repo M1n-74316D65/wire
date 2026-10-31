@@ -29,7 +29,7 @@ export default async function SummarizePage({ searchParams }: Props) {
   const title = (sp.title || "").trim();
   const unlocked = await isSummarizeUnlocked();
   const configured = summarizeConfigured();
-  const queryError = sp.error ? decodeURIComponent(sp.error) : null;
+  const queryError = sp.error || null;
   const force = sp.force === "1";
   const wantRun = sp.run === "1" || force;
 

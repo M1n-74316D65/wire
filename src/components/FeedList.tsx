@@ -32,7 +32,7 @@ export function FeedList({
       {headlines.map((h) => {
         const source = getSource(h.sourceSlug);
         return (
-          <li key={h.url} className="feed__item">
+          <li key={`${h.sourceSlug}:${h.url}`} className="feed__item">
             {source ? (
               <a className="feed__source" href={`/source/${source.slug}`}>
                 {source.name}

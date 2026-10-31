@@ -20,7 +20,7 @@ export function HeadlineList({
     <ul className="headline-list">
       {headlines.map((h) => {
         return (
-          <li key={h.url}>
+          <li key={`${h.sourceSlug}:${h.url}`}>
             <a className="headline" href={h.url} rel="noopener noreferrer">
               {h.title}
             </a>{" "}
@@ -28,7 +28,12 @@ export function HeadlineList({
             {h.hnUrl ? (
               <>
                 {" "}
-                <a className="tag" href={h.hnUrl} rel="noopener noreferrer">
+                <a
+                  className="tag"
+                  href={h.hnUrl}
+                  rel="noopener noreferrer"
+                  aria-label={`Hacker News discussion: ${h.title}`}
+                >
                   hn
                 </a>
               </>

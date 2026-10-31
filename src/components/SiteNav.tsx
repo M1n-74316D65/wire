@@ -25,7 +25,7 @@ export function SiteNav({ active }: { active?: string }) {
       <div className="topic-nav__group">
         {primary.map((item) =>
           active === item.key ? (
-            <span key={item.key} className="is-active">
+            <span key={item.key} className="is-active" aria-current="page">
               {item.label}
             </span>
           ) : (
@@ -38,7 +38,7 @@ export function SiteNav({ active }: { active?: string }) {
       <div className="topic-nav__group">
         {rest.map((item) =>
           active === item.key ? (
-            <span key={item.key} className="is-active">
+            <span key={item.key} className="is-active" aria-current="page">
               {item.label}
             </span>
           ) : (
@@ -51,7 +51,7 @@ export function SiteNav({ active }: { active?: string }) {
       <div className="topic-nav__group topic-nav__group--foot">
         {footer.map((item) =>
           active === item.key ? (
-            <span key={item.key} className="is-active">
+            <span key={item.key} className="is-active" aria-current="page">
               {item.label}
             </span>
           ) : (

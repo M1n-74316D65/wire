@@ -45,7 +45,7 @@ export function SiteHeader({
             .
           </p>
         </div>
-        <div className="theme-toggle" aria-label="Color theme">
+        <div className="theme-toggle" role="group" aria-label="Color theme">
           <ThemeOption current={theme} value="system" label="auto" />
           <span className="sep" aria-hidden="true">
             ·
