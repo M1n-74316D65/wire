@@ -36,10 +36,12 @@ export function PageChrome({
           <SourceNav active={activeNav} />
         </aside>
         <div className="desk__main">
-          {title ? <h2 className="desk__title">{title}</h2> : null}
-          {showFilters && basePath != null && limit != null && hours != null ? (
-            <Filters basePath={basePath} limit={limit} hours={hours} />
-          ) : null}
+          <div className="desk__bar">
+            {title ? <h2 className="desk__title">{title}</h2> : null}
+            {showFilters && basePath != null && limit != null && hours != null ? (
+              <Filters basePath={basePath} limit={limit} hours={hours} />
+            ) : null}
+          </div>
           {children}
         </div>
       </div>
