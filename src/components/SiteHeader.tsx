@@ -38,7 +38,10 @@ export function SiteHeader({
             <Link href="/">wire</Link>
           </h1>
           <p className="tagline">
-            A quiet desk for the feeds you keep. Pulled{" "}
+            <span className="tagline__motto">
+              A quiet desk for the feeds you keep.{" "}
+            </span>
+            Pulled{" "}
             <time dateTime={new Date(lastUpdated ?? nowMs()).toISOString()}>
               {formatLastUpdated(lastUpdated)}
             </time>

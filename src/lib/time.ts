@@ -16,16 +16,14 @@ export const SPAIN_TIME_ZONE = "Europe/Madrid";
 
 export function formatLastUpdated(ts: number | null): string {
   const d = new Date(ts ?? Date.now());
-  return d.toLocaleString("es-ES", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
+  return d.toLocaleString("en-GB", {
+    weekday: "short",
     day: "numeric",
+    month: "short",
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
     timeZone: SPAIN_TIME_ZONE,
-    timeZoneName: "short",
   });
 }
 
