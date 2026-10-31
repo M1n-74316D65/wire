@@ -98,6 +98,29 @@ function markOmission(text: string, full: string): string {
   return marked.length <= MAX_CHARS ? marked : text;
 }
 
+const MAX_BYTES = 2_000_000;
+
+async function readCapped(res: Response): Promise<string> {
+  if (Number(res.headers.get("content-length") || 0) > MAX_BYTES) {
+    throw new Error("Article is too large");
+  }
+  const reader = res.body?.getReader();
+  if (!reader) return "";
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    total += value.length;
+    if (total > MAX_BYTES) {
+      await reader.cancel();
+      throw new Error("Article is too large");
+    }
+    chunks.push(value);
+  }
+  return new TextDecoder().decode(Buffer.concat(chunks));
+}
+
 export async function fetchArticleText(url: string): Promise<string> {
   const res = await fetch(url, {
     headers: {
@@ -123,7 +146,7 @@ export async function fetchArticleText(url: string): Promise<string> {
     throw new Error("URL is not an HTML article");
   }
 
-  const body = await res.text();
+  const body = await readCapped(res);
   let blocks: string[];
   if (contentType.includes("text/plain")) {
     blocks = textToBlocks(body);

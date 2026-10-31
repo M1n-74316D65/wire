@@ -448,26 +448,8 @@ code {
   opacity: 0.88;
 }
 
-.empty-state,
-.prose {
+.empty-state {
   max-width: 40rem;
-}
-
-.prose h2,
-.prose h3 {
-  font-family: var(--font-serif);
-  font-weight: 700;
-  margin-top: 0;
-}
-
-.prose p {
-  color: var(--ink);
-  font-size: 1.15rem;
-  line-height: 1.6;
-}
-
-.prose strong {
-  font-weight: 700;
 }
 
 .meta--wrap {
@@ -614,8 +596,7 @@ code {
   border-bottom-color: var(--accent);
 }
 
-.summarize-form button,
-.btn {
+.summarize-form button {
   font-family: var(--font-sans);
   font-size: 0.9rem;
   font-weight: 500;
@@ -628,8 +609,7 @@ code {
   margin-top: 0.5rem;
 }
 
-.summarize-form button:hover,
-.btn:hover {
+.summarize-form button:hover {
   background: var(--ink);
   color: var(--bg);
 }
@@ -796,8 +776,7 @@ code {
   }
 
   .brief__p,
-  .brief__list li,
-  .prose p {
+  .brief__list li {
     font-size: 1.05rem;
   }
 

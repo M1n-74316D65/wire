@@ -68,10 +68,6 @@ export function saveSummary(row: Omit<SummaryRow, "created_at"> & { created_at?:
     });
 }
 
-export function deleteSummary(url: string) {
-  getDb().prepare("DELETE FROM summaries WHERE url = ?").run(url);
-}
-
 export async function summarizeUrl(opts: {
   url: string;
   title?: string | null;
@@ -80,8 +76,6 @@ export async function summarizeUrl(opts: {
   if (!opts.force) {
     const cached = getCachedSummary(opts.url);
     if (cached) return cached;
-  } else {
-    deleteSummary(opts.url);
   }
 
   const ai = getAiConfig();
