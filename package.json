@@ -7,11 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "bun run scripts/fetch-article.test.ts && bun run scripts/source-nav.test.tsx",
+    "test": "bun run scripts/fetch-article.test.ts && bun run scripts/source-nav.test.tsx && bun run scripts/ingest-route.test.ts",
     "ingest": "bun run scripts/ingest.ts"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^4.0.99",
     "@ai-sdk/openai-compatible": "^3.0.75",
     "@mozilla/readability": "^0.6.0",
     "ai": "^7.0.148",

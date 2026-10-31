@@ -42,6 +42,9 @@ async function ingestSource(slug: string, feedUrl: string): Promise<IngestResult
   const source = getSource(slug);
   const topic = source ? topicForSource(source) : null;
 
+  const exists = db.prepare(
+    "SELECT 1 FROM headlines WHERE source_slug = ? AND url = ?",
+  );
   const insert = db.prepare(`
     INSERT INTO headlines (
       source_slug, title, url, published_at, hn_url, ingested_at, topic
@@ -51,7 +54,6 @@ async function ingestSource(slug: string, feedUrl: string): Promise<IngestResult
     )
     ON CONFLICT(source_slug, url) DO UPDATE SET
       title = excluded.title,
-      published_at = excluded.published_at,
       hn_url = COALESCE(excluded.hn_url, headlines.hn_url)
   `);
 
@@ -64,7 +66,8 @@ async function ingestSource(slug: string, feedUrl: string): Promise<IngestResult
         const title = (item.title || "").trim();
         const url = (item.link || "").trim();
         if (!title || !url) continue;
-        const info = insert.run({
+        const isNew = !exists.get(slug, url);
+        insert.run({
           source_slug: slug,
           title,
           url,
@@ -73,7 +76,7 @@ async function ingestSource(slug: string, feedUrl: string): Promise<IngestResult
           ingested_at: now,
           topic: topic ?? null,
         });
-        if (info.changes > 0) inserted += 1;
+        if (isNew) inserted += 1;
       }
     });
     tx(feed.items || []);

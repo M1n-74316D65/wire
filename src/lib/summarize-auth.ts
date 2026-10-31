@@ -41,6 +41,7 @@ export async function unlockSummarize() {
   const store = await cookies();
   store.set(COOKIE, tokenFor(password), {
     httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
     maxAge: MAX_AGE,
