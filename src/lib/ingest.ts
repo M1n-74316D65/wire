@@ -1,6 +1,6 @@
 import Parser from "rss-parser";
 import { classifyItem } from "./blocklist";
-import { getDb, setLastIngestAt } from "./db";
+import { getDb, setLastIngestAt, setSourceStatus } from "./db";
 import { getSource, SOURCES, topicForSource } from "./sources";
 
 const parser = new Parser({
@@ -88,13 +88,21 @@ async function ingestSource(slug: string, feedUrl: string): Promise<IngestResult
       }
     });
     tx(feed.items || []);
+    setSourceStatus(slug, {
+      at: now,
+      ok: true,
+      inserted,
+      blocked,
+    });
     return { source: slug, inserted, blocked };
   } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    setSourceStatus(slug, { at: Date.now(), ok: false, error: message });
     return {
       source: slug,
       inserted: 0,
       blocked: 0,
-      error: err instanceof Error ? err.message : String(err),
+      error: message,
     };
   }
 }

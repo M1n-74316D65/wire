@@ -15,7 +15,8 @@ export function AiLink({ url, title }: { url: string; title: string }) {
     <a
       className="tag tag--ai"
       href={summarizeHref(url, title, true)}
-      aria-label={`Summarize: ${title}`}
+      aria-label={`Summarize with AI: ${title}`}
+      title="Summarize with AI"
       onClick={(e) => {
         const pw = localStorage.getItem(SUMMARIZE_PW_KEY);
         if (!pw) return;
@@ -41,7 +42,7 @@ export function AiLink({ url, title }: { url: string; title: string }) {
         <path d="M12 2.5 13.9 8.6 20 10.5 13.9 12.4 12 18.5 10.1 12.4 4 10.5 10.1 8.6 12 2.5Z" />
         <path d="M19 15.5 19.9 18.1 22.5 19 19.9 19.9 19 22.5 18.1 19.9 15.5 19 18.1 18.1 19 15.5Z" />
       </svg>
-      <span className="tag__label">ai</span>
+      <span className="tag__label">brief</span>
     </a>
   );
 }

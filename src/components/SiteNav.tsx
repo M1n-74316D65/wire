@@ -22,6 +22,7 @@ export function SiteNav({ active }: { active?: string }) {
 
   return (
     <nav className="topic-nav" aria-label="Sections">
+      <span className="source-nav__title">Sections</span>
       <div className="topic-nav__group">
         {primary.map((item) =>
           active === item.key ? (

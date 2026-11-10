@@ -1,7 +1,7 @@
 import { AiLink } from "@/components/AiLink";
 import { summarizeConfigured } from "@/lib/env";
 import type { Headline } from "@/lib/queries";
-import { getSource } from "@/lib/sources";
+import { getSource, sourceColor } from "@/lib/sources";
 import { relativeTime } from "@/lib/time";
 
 export function FeedList({
@@ -34,11 +34,24 @@ export function FeedList({
         return (
           <li key={`${h.sourceSlug}:${h.url}`} className="feed__item">
             {source ? (
-              <a className="feed__source" href={`/source/${source.slug}`}>
-                {source.name}
+              <a
+                className="feed__source"
+                href={`/source/${source.slug}`}
+                style={{ ["--source-color" as string]: sourceColor(source.slug) }}
+              >
+                <span className="feed__source-dot" aria-hidden="true" />
+                <span className="feed__source-name">{source.name}</span>
               </a>
             ) : (
-              <span className="feed__source">{h.sourceSlug}</span>
+              <span
+                className="feed__source"
+                style={{
+                  ["--source-color" as string]: sourceColor(h.sourceSlug),
+                }}
+              >
+                <span className="feed__source-dot" aria-hidden="true" />
+                <span className="feed__source-name">{h.sourceSlug}</span>
+              </span>
             )}
             <a
               className="feed__headline"

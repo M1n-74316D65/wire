@@ -65,6 +65,14 @@ export function getDb(): Database.Database {
       created_at INTEGER NOT NULL,
       version INTEGER NOT NULL DEFAULT 1
     );
+    CREATE TABLE IF NOT EXISTS source_status (
+      source_slug     TEXT PRIMARY KEY,
+      last_fetched_at INTEGER NOT NULL,
+      ok              INTEGER NOT NULL,
+      error           TEXT,
+      inserted        INTEGER NOT NULL DEFAULT 0,
+      blocked         INTEGER NOT NULL DEFAULT 0
+    );
   `);
 
   // Existing DBs created before topic columns
@@ -92,6 +100,101 @@ export function setLastIngestAt(ts: number) {
        ON CONFLICT(key) DO UPDATE SET value = excluded.value`,
     )
     .run(String(ts));
+}
+
+export type SourceStatus = {
+  source_slug: string;
+  last_fetched_at: number;
+  ok: boolean;
+  error: string | null;
+  inserted: number;
+  blocked: number;
+};
+
+/** Record the outcome of one source's ingest attempt. */
+export function setSourceStatus(
+  source_slug: string,
+  outcome: {
+    at: number;
+    ok: boolean;
+    error?: string | null;
+    inserted?: number;
+    blocked?: number;
+  },
+) {
+  getDb()
+    .prepare(
+      `INSERT INTO source_status
+         (source_slug, last_fetched_at, ok, error, inserted, blocked)
+       VALUES (?, ?, ?, ?, ?, ?)
+       ON CONFLICT(source_slug) DO UPDATE SET
+         last_fetched_at = excluded.last_fetched_at,
+         ok = excluded.ok,
+         error = excluded.error,
+         inserted = excluded.inserted,
+         blocked = excluded.blocked`,
+    )
+    .run(
+      source_slug,
+      outcome.at,
+      outcome.ok ? 1 : 0,
+      outcome.error ?? null,
+      outcome.inserted ?? 0,
+      outcome.blocked ?? 0,
+    );
+}
+
+export function getSourceStatus(
+  source_slug: string,
+): SourceStatus | null {
+  const row = getDb()
+    .prepare(
+      `SELECT source_slug, last_fetched_at, ok, error, inserted, blocked
+       FROM source_status WHERE source_slug = ?`,
+    )
+    .get(source_slug) as
+    | {
+        source_slug: string;
+        last_fetched_at: number;
+        ok: number;
+        error: string | null;
+        inserted: number;
+        blocked: number;
+      }
+    | undefined;
+  if (!row) return null;
+  return {
+    source_slug: row.source_slug,
+    last_fetched_at: row.last_fetched_at,
+    ok: !!row.ok,
+    error: row.error,
+    inserted: row.inserted,
+    blocked: row.blocked,
+  };
+}
+
+export function getAllSourceStatus(): SourceStatus[] {
+  const rows = getDb()
+    .prepare(
+      `SELECT source_slug, last_fetched_at, ok, error, inserted, blocked
+       FROM source_status`,
+    )
+    .all() as {
+    source_slug: string;
+    last_fetched_at: number;
+    ok: number;
+    error: string | null;
+    inserted: number;
+    blocked: number;
+  }[];
+  return rows.map((r) => ({
+    source_slug: r.source_slug,
+    last_fetched_at: r.last_fetched_at,
+    ok: !!r.ok,
+    error: r.error,
+    inserted: r.inserted,
+    blocked: r.blocked,
+  }));
 }
 
 

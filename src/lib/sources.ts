@@ -372,6 +372,36 @@ export function fallbackTopic(topics: Topic[]): Topic | null {
   return topics.find((t) => t !== "news") ?? topics[0];
 }
 
+/**
+ * Deterministic source-identity color. A small palette of muted hues that read
+ * well on both light and dark canvases; the slug is hashed into it so a source
+ * always gets the same color. Pure + stable (testable).
+ */
+const SOURCE_COLORS = [
+  "#2f6f6a",
+  "#6a4d2f",
+  "#4a5a8a",
+  "#7a4a5a",
+  "#3f6a3f",
+  "#8a5a2f",
+  "#5a4a8a",
+  "#2f5a7a",
+  "#6a3f3f",
+  "#4a6a5a",
+];
+
+function hashSlug(slug: string): number {
+  let h = 0;
+  for (let i = 0; i < slug.length; i++) {
+    h = (h * 31 + slug.charCodeAt(i)) >>> 0;
+  }
+  return h;
+}
+
+export function sourceColor(slug: string): string {
+  return SOURCE_COLORS[hashSlug(slug) % SOURCE_COLORS.length];
+}
+
 /** Topic assigned at ingest time, purely from the source's tags. */
 export function topicForSource(source: Source): Topic | null {
   return topicFromSourceAlone(source.topics) ?? fallbackTopic(source.topics);

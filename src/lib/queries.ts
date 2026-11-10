@@ -1,10 +1,18 @@
-import { getDb, getLastIngestAt, type HeadlineRow } from "./db";
+import {
+  getAllSourceStatus,
+  getDb,
+  getLastIngestAt,
+  type HeadlineRow,
+  type SourceStatus,
+} from "./db";
 import {
   getSource,
+  SOURCES,
   sourcesForTopic,
   type Source,
   type Topic,
 } from "./sources";
+import { relativeTime } from "./time";
 
 export type Headline = {
   title: string;
@@ -169,4 +177,38 @@ export function wordFrequencies(hours: number, top = 80): { word: string; count:
 
 export function lastUpdatedLabel(): number | null {
   return getLastIngestAt();
+}
+
+export type SourceHealth = {
+  slug: string;
+  state: "fresh" | "stale" | "failed" | "never";
+  detail: string | null;
+};
+
+const STALE_MS = 6 * 60 * 60 * 1000;
+
+function healthFor(slug: string, s: SourceStatus | null): SourceHealth {
+  if (!s) return { slug, state: "never", detail: null };
+  if (!s.ok)
+    return {
+      slug,
+      state: "failed",
+      detail: s.error ?? "last fetch failed",
+    };
+  const age = Date.now() - s.last_fetched_at;
+  if (age <= STALE_MS) {
+    return { slug, state: "fresh", detail: relativeTime(s.last_fetched_at) };
+  }
+  return {
+    slug,
+    state: "stale",
+    detail: `last fetched ${relativeTime(s.last_fetched_at)} ago`,
+  };
+}
+
+/** Health of every source (fresh / stale / failed / never-fetched). */
+export function getSourceHealth(): SourceHealth[] {
+  const map = new Map<string, SourceStatus>();
+  for (const s of getAllSourceStatus()) map.set(s.source_slug, s);
+  return SOURCES.map((src) => healthFor(src.slug, map.get(src.slug) ?? null));
 }

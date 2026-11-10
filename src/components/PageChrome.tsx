@@ -4,6 +4,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteNav } from "@/components/SiteNav";
 import { SourceNav } from "@/components/SourceNav";
 import { TabBar } from "@/components/TabBar";
+import { getSourceHealth } from "@/lib/queries";
 import type { Theme } from "@/lib/theme";
 
 export function PageChrome({
@@ -27,13 +28,14 @@ export function PageChrome({
   showFilters?: boolean;
   title?: string;
 }) {
+  const health = getSourceHealth();
   return (
     <Shell>
       <SiteHeader theme={theme} lastUpdated={lastUpdated} />
       <div className="desk">
         <aside className="desk__rail">
           <SiteNav active={activeNav} />
-          <SourceNav active={activeNav} />
+          <SourceNav active={activeNav} health={health} />
         </aside>
         <div className="desk__main">
           <div className="desk__bar">
