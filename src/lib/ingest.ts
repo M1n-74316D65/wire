@@ -1,4 +1,5 @@
 import Parser from "rss-parser";
+import { classifyItem } from "./blocklist";
 import { getDb, setLastIngestAt } from "./db";
 import { getSource, SOURCES, topicForSource } from "./sources";
 
@@ -13,6 +14,7 @@ const parser = new Parser({
 export type IngestResult = {
   source: string;
   inserted: number;
+  blocked: number;
   error?: string;
 };
 
@@ -61,11 +63,17 @@ async function ingestSource(slug: string, feedUrl: string): Promise<IngestResult
     const feed = await parser.parseURL(feedUrl);
     const now = Date.now();
     let inserted = 0;
+    let blocked = 0;
     const tx = db.transaction((items: Parser.Item[]) => {
       for (const item of items) {
         const title = (item.title || "").trim();
         const url = (item.link || "").trim();
         if (!title || !url) continue;
+        // Block promo / affiliate / deal noise before it reaches the desk.
+        if (classifyItem(title, url)) {
+          blocked += 1;
+          continue;
+        }
         const isNew = !exists.get(slug, url);
         insert.run({
           source_slug: slug,
@@ -80,11 +88,12 @@ async function ingestSource(slug: string, feedUrl: string): Promise<IngestResult
       }
     });
     tx(feed.items || []);
-    return { source: slug, inserted };
+    return { source: slug, inserted, blocked };
   } catch (err) {
     return {
       source: slug,
       inserted: 0,
+      blocked: 0,
       error: err instanceof Error ? err.message : String(err),
     };
   }

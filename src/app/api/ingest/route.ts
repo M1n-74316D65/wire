@@ -24,6 +24,7 @@ async function run(req: Request) {
     sourcesOk: ok,
     sourcesFailed: fail.length,
     inserted: results.reduce((sum, r) => sum + r.inserted, 0),
+    blocked: results.reduce((sum, r) => sum + r.blocked, 0),
     failures: fail,
   });
 }
