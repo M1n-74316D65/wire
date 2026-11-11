@@ -17,6 +17,7 @@ export function SiteNav({ active }: { active?: string }) {
   }));
 
   const footer: { href: string; label: string; key: string }[] = [
+    { href: "/brief", label: "Brief", key: "brief" },
     { href: "/words", label: "Words", key: "words" },
   ];
 

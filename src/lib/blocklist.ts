@@ -17,7 +17,7 @@ export type BlockReason = "promo-keyword" | "affiliate-url" | "promo-domain";
  * to avoid catching legitimate business coverage.
  */
 export const PROMO_KEYWORDS: RegExp =
-  /\b(black ?friday|cyber ?monday|flash ?sale|limited ?time( ?(offer|deal))?\b|(\d{1,2})% ?off\b|percent ?off\b|use ?code\b|promo ?code\b|coupon ?code\b|free ?shipping\b|deal of the (day|week)\b|prime ?day\b|best ?seller\b)/i;
+ /\b(black ?friday|cyber ?monday|flash ?sale|limited ?time( ?(offer|deal))?\b|(\d{1,2})% ?off\b|percent ?off\b|use ?code\b|promo ?code\b|coupon ?code\b|free ?shipping\b|dealthe (day|week)\b|prime ?day\b|best ?seller\b|descuent[oa]s?\b|rebajas?\b|liquidaci[oó]n\b|cup[óo]n(es)?\b|\bdtos?\b|ofertas y? descuentos|ahora \d+ ?(?=€|\$)|env[ií]o gratis\b)/i;
 
 /** Affiliate / tracking params that indicate a promotional outbound link. */
 export const AFFILIATE_URL: RegExp =

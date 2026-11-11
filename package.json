@@ -7,8 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "bun run scripts/fetch-article.test.ts && bun run scripts/source-nav.test.tsx && bun run scripts/blocklist.test.ts && bun run scripts/ingest-route.test.ts",
-    "ingest": "bun run scripts/ingest.ts"
+    "test": "bun run scripts/fetch-article.test.ts bun run scripts/source-nav.test.tsx bun run scripts/blocklist.test.ts bun run scripts/ingest-route.test.ts bun run scripts/digest.test.ts",
+    "ingest": "bun run scripts/ingest.ts",
+    "digest": "bun run scripts/digest.ts"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^3.0.75",

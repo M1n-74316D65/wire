@@ -59,4 +59,24 @@ assert.equal(
   "Prime Day promo should be blocked",
 );
 
+assert.equal(
+ classifyItem("Rebajas: liquidación temporada, hasta cupón 50% dto", "https://www.example.com/season-sale"),
+ "promo-keyword",
+ "Spanish promo copy should blocked",
+);
+assert.equal(
+ classifyItem("Hoy en la tienda: ofertas y descuentos", "https://www.example.com/store"),
+ "promo-keyword",
+ "Spanish ofertas/descuentos should blocked",
+);
+assert.equal(
+ classifyItem("Apple presenta su nuevo portátil para creadores de contenido", "https://www.example.com/apple-laptop"),
+ null,
+ "a normal Spanish tech headline must not blocked",
+);
+assert.equal(
+ classifyItem("Rebajas de invierno: la temporada de descuentos llega", "https://www.theguardian.com/uk/rebajas"),
+ "promo-keyword",
+ "Spanish rebajas/descuentos should blocked",
+);
 console.log("blocklist.test.ts: all assertions passed");

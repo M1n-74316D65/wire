@@ -73,6 +73,12 @@ export function getDb(): Database.Database {
       inserted        INTEGER NOT NULL DEFAULT 0,
       blocked         INTEGER NOT NULL DEFAULT 0
     );
+    CREATE TABLE IF NOT EXISTS digests (
+      day        TEXT PRIMARY KEY,
+      model      TEXT NOT NULL,
+      content    TEXT NOT NULL,
+      created_at INTEGER NOT NULL
+    );
   `);
 
   // Existing DBs created before topic columns
