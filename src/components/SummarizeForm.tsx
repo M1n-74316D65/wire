@@ -70,9 +70,10 @@ export function SummarizeForm({
             name="password"
             required
             autoComplete="current-password"
+            aria-describedby="password-hint"
             autoFocus={fromFeed}
           />
-          <p className="meta meta--wrap">
+          <p className="meta meta--wrap" id="password-hint">
             Kept in this browser so the next ai tap skips the form.
           </p>
         </>

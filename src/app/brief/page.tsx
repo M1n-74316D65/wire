@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { PageChrome } from "@/components/PageChrome";
 import { BriefForm } from "@/components/BriefForm";
 import { DigestBody } from "@/components/DigestBody";
@@ -15,6 +16,10 @@ import { SPAIN_TIME_ZONE } from "@/lib/time";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
+
+export const metadata: Metadata = {
+  title: "Daily brief · wire",
+};
 
 type Props = {
   searchParams: Promise<{
@@ -72,7 +77,7 @@ export default async function DigestPage({ searchParams }: Props) {
     <PageChrome
       theme={theme}
       lastUpdated={digest?.createdAt ?? null}
-      activeNav="home"
+      activeNav="brief"
       showFilters={false}
       title="Daily brief"
     >
@@ -84,12 +89,22 @@ export default async function DigestPage({ searchParams }: Props) {
           </p>
         ) : null}
 
-        {sp.error ? <p className="error">Error: {sp.error}</p> : null}
-        {runError ? <p className="error">Error: {runError}</p> : null}
+        {sp.error ? (
+          <p className="error" role="alert">
+            Error: {sp.error}
+          </p>
+        ) : null}
+        {runError ? (
+          <p className="error" role="alert">
+            Error: {runError}
+          </p>
+        ) : null}
 
         {digest ? (
           <article className="brief-card">
-            <h1 className="brief-card__title">Daily brief</h1>
+            <h2 className="brief-card__title">
+              {requestedDay === today ? "Today" : "Yesterday"}
+            </h2>
             <DigestBody text={digest.content} />
             <footer className="brief-card__foot">
               <span className="meta meta--wrap">

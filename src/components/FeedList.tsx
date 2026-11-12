@@ -16,19 +16,13 @@ export function FeedList({
   if (headlines.length === 0) {
     return (
       <div className="empty-state">
-        <p>
-          Nothing in this window. Try a wider time range, or refresh feeds at{" "}
-          <a href="/api/ingest">
-            <code>/api/ingest</code>
-          </a>
-          .
-        </p>
+        <p>Nothing in this window. Try a wider time range.</p>
       </div>
     );
   }
 
   return (
-    <ol className="feed">
+    <ol className="feed" role="list">
       {headlines.map((h) => {
         const source = getSource(h.sourceSlug);
         return (
@@ -65,7 +59,12 @@ export function FeedList({
                 {relativeTime(h.publishedAt, now)}
               </time>
               {h.hnUrl ? (
-                <a className="tag" href={h.hnUrl} rel="noopener noreferrer">
+                <a
+                  className="tag"
+                  href={h.hnUrl}
+                  rel="noopener noreferrer"
+                  aria-label={`Hacker News discussion: ${h.title}`}
+                >
                   hn
                 </a>
               ) : null}

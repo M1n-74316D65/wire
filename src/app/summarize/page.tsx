@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { PageChrome } from "@/components/PageChrome";
 import { SummarizeForm } from "@/components/SummarizeForm";
 import { SummaryBody } from "@/components/SummaryBody";
@@ -11,6 +12,10 @@ import { SPAIN_TIME_ZONE } from "@/lib/time";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
+
+export const metadata: Metadata = {
+  title: "Brief · wire",
+};
 
 type Props = {
   searchParams: Promise<{
@@ -76,12 +81,20 @@ export default async function SummarizePage({ searchParams }: Props) {
           </p>
         ) : null}
 
-        {queryError ? <p className="error">Error: {queryError}</p> : null}
-        {runError ? <p className="error">Error: {runError}</p> : null}
+        {queryError ? (
+          <p className="error" role="alert">
+            Error: {queryError}
+          </p>
+        ) : null}
+        {runError ? (
+          <p className="error" role="alert">
+            Error: {runError}
+          </p>
+        ) : null}
 
         {summaryText ? (
           <article className="brief-card">
-            {title ? <h1 className="brief-card__title">{title}</h1> : null}
+            {title ? <h2 className="brief-card__title">{title}</h2> : null}
             {url ? (
               <p className="brief-card__source">
                 <a href={url} rel="noopener noreferrer">

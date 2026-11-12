@@ -47,9 +47,10 @@ export function BriefForm({
             name="password"
             required
             autoComplete="current-password"
+            aria-describedby="brief-password-hint"
             autoFocus
           />
-          <p className="meta meta--wrap">
+          <p className="meta meta--wrap" id="brief-password-hint">
             Kept in this browser so the next tap skips the form.
           </p>
         </>

@@ -1,6 +1,13 @@
 import { SOURCES } from "@/lib/sources";
 import type { SourceHealth } from "@/lib/queries";
 
+const STATE_LABEL: Record<SourceHealth["state"], string | null> = {
+  fresh: "fresh",
+  stale: "stale",
+  failed: "failed",
+  never: null,
+};
+
 export function SourceNav({
   active,
   health,
@@ -16,6 +23,7 @@ export function SourceNav({
       <nav className="topic-nav__group" aria-label="Sources">
         {SOURCES.map((source) => {
           const h = bySlug.get(source.slug);
+          const state = h ? STATE_LABEL[h.state] : null;
           const dot =
             h && h.state !== "never" ? (
               <span
@@ -24,10 +32,18 @@ export function SourceNav({
                 title={h.detail ?? h.state}
               />
             ) : null;
-          return active === source.slug ? (
-            <span key={source.slug} className="is-active" aria-current="page">
+          const label = (
+            <>
               {source.name}
               {dot}
+              {state ? (
+                <span className="visually-hidden"> ({state})</span>
+              ) : null}
+            </>
+          );
+          return active === source.slug ? (
+            <span key={source.slug} className="is-active" aria-current="page">
+              {label}
             </span>
           ) : (
             <a
@@ -37,8 +53,7 @@ export function SourceNav({
                 h && h.state === "failed" ? h.detail ?? undefined : undefined
               }
             >
-              {source.name}
-              {dot}
+              {label}
             </a>
           );
         })}

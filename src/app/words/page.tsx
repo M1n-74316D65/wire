@@ -2,8 +2,13 @@ import { PageChrome } from "@/components/PageChrome";
 import { lastUpdatedLabel, wordFrequencies } from "@/lib/queries";
 import { getTheme } from "@/lib/theme";
 import { parseHours, parseLimit } from "@/lib/time";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Words · wire",
+};
 
 type Props = {
   searchParams: Promise<{ limit?: string; hours?: string }>;

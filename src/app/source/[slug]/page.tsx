@@ -1,11 +1,23 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { HeadlineList } from "@/components/HeadlineList";
 import { PageChrome } from "@/components/PageChrome";
 import { getSourceColumn, lastUpdatedLabel } from "@/lib/queries";
+import { getSource } from "@/lib/sources";
 import { getTheme } from "@/lib/theme";
 import { nowMs, parseHours, parseLimit } from "@/lib/time";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const source = getSource(slug);
+  return { title: source ? `${source.name} · wire` : "wire" };
+}
 
 type Props = {
   params: Promise<{ slug: string }>;

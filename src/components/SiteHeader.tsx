@@ -12,13 +12,12 @@ function ThemeOption({
   value: Theme;
   label: string;
 }) {
-  if (current === value) {
-    return <span className="is-active">{label}</span>;
-  }
   return (
     <form action={setThemeAction}>
       <input type="hidden" name="theme" value={value} />
-      <button type="submit">{label}</button>
+      <button type="submit" aria-pressed={current === value}>
+        {label}
+      </button>
     </form>
   );
 }

@@ -37,7 +37,7 @@ export function PageChrome({
           <SiteNav active={activeNav} />
           <SourceNav active={activeNav} health={health} />
         </aside>
-        <div className="desk__main">
+        <main id="content" className="desk__main" tabIndex={-1}>
           <div className="desk__bar">
             {title ? <h2 className="desk__title">{title}</h2> : null}
             {showFilters && basePath != null && limit != null && hours != null ? (
@@ -45,7 +45,7 @@ export function PageChrome({
             ) : null}
           </div>
           {children}
-        </div>
+        </main>
       </div>
       <TabBar active={activeNav} />
     </Shell>

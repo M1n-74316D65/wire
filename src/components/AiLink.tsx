@@ -15,7 +15,7 @@ export function AiLink({ url, title }: { url: string; title: string }) {
     <a
       className="tag tag--ai"
       href={summarizeHref(url, title, true)}
-      aria-label={`Summarize with AI: ${title}`}
+      aria-label={`brief: ${title}`}
       title="Summarize with AI"
       onClick={(e) => {
         const pw = localStorage.getItem(SUMMARIZE_PW_KEY);

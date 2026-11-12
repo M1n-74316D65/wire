@@ -15,9 +15,15 @@ assert(nav, "the sources navigation is missing");
 
 for (const source of SOURCES.filter((source) => source.slug !== "hn")) {
   const link: Element | null = nav.querySelector(`a[href="/source/${source.slug}"]`);
-  assert.equal(link?.textContent, source.name, `${source.name} has no direct link`);
+  assert(
+    link?.textContent?.startsWith(source.name),
+    `${source.name} has no direct link`,
+  );
 }
-assert.equal(nav.querySelector('[aria-current="page"]')?.textContent, "Hacker News");
+assert(
+  nav.querySelector('[aria-current="page"]')?.textContent?.startsWith("Hacker News"),
+  "the active source is not marked",
+);
 
 // sourceColor is deterministic: same slug always maps to the same palette entry.
 for (const source of SOURCES) {

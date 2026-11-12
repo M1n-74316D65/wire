@@ -27,8 +27,10 @@ export function Filters({
 
   return (
     <div className="filters">
-      <div className="filter-group">
-        <span className="filter-group__label">show</span>
+      <div className="filter-group" role="group" aria-labelledby="filter-show">
+        <span className="filter-group__label" id="filter-show">
+          show
+        </span>
         <div className="filter-group__opts">
           {LIMIT_OPTIONS.map((n) =>
             n === limit ? (
@@ -43,8 +45,14 @@ export function Filters({
           )}
         </div>
       </div>
-      <div className="filter-group">
-        <span className="filter-group__label">window</span>
+      <div
+        className="filter-group"
+        role="group"
+        aria-labelledby="filter-window"
+      >
+        <span className="filter-group__label" id="filter-window">
+          window
+        </span>
         <div className="filter-group__opts">
           {HOUR_OPTIONS.map((n) =>
             n === hours ? (

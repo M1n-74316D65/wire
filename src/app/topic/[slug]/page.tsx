@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { FeedList } from "@/components/FeedList";
 import { PageChrome } from "@/components/PageChrome";
 import { getFeed, lastUpdatedLabel } from "@/lib/queries";
@@ -9,6 +10,22 @@ import { nowMs, parseHours, parseLimit } from "@/lib/time";
 export const dynamic = "force-dynamic";
 
 const VALID = new Set(["all", ...TOPICS.map((t) => t.slug)]);
+
+function topicLabel(slug: string): string {
+  return slug === "all"
+    ? "Everything"
+    : (TOPICS.find((t) => t.slug === slug)?.label ?? slug);
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  if (!VALID.has(slug)) return {};
+  return { title: `${topicLabel(slug)} · wire` };
+}
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -26,10 +43,7 @@ export default async function TopicPage({ params, searchParams }: Props) {
   const theme = await getTheme();
   const headlines = getFeed({ topic, limit, hours });
   const now = nowMs();
-  const title =
-    slug === "all"
-      ? "Everything"
-      : (TOPICS.find((t) => t.slug === slug)?.label ?? slug);
+  const title = topicLabel(slug);
 
   return (
     <PageChrome

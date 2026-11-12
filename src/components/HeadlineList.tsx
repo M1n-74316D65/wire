@@ -17,7 +17,7 @@ export function HeadlineList({
   }
 
   return (
-    <ul className="headline-list">
+    <ul className="headline-list" role="list">
       {headlines.map((h) => {
         return (
           <li key={`${h.sourceSlug}:${h.url}`}>
