@@ -23,11 +23,12 @@ export function HeadlineList({
           <li key={`${h.sourceSlug}:${h.url}`}>
             <a className="headline" href={h.url} rel="noopener noreferrer">
               {h.title}
-            </a>{" "}
-            <span className="meta">{relativeTime(h.publishedAt, now)}</span>
-            {h.hnUrl ? (
-              <>
-                {" "}
+            </a>
+            <span className="feed__meta">
+              <time dateTime={new Date(h.publishedAt).toISOString()}>
+                {relativeTime(h.publishedAt, now)}
+              </time>
+              {h.hnUrl ? (
                 <a
                   className="tag"
                   href={h.hnUrl}
@@ -36,14 +37,9 @@ export function HeadlineList({
                 >
                   hn
                 </a>
-              </>
-            ) : null}
-            {aiEnabled ? (
-              <>
-                {" "}
-                <AiLink url={h.url} title={h.title} />
-              </>
-            ) : null}
+              ) : null}
+              {aiEnabled ? <AiLink url={h.url} title={h.title} /> : null}
+            </span>
           </li>
         );
       })}

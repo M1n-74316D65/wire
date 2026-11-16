@@ -2,6 +2,7 @@ import Parser from "rss-parser";
 import { classifyItem } from "./blocklist";
 import { getDb, setLastIngestAt, setSourceStatus } from "./db";
 import { getSource, SOURCES, topicForSource } from "./sources";
+import { decodeEntities } from "./text";
 
 const parser = new Parser({
   timeout: 15_000,
@@ -66,7 +67,7 @@ async function ingestSource(slug: string, feedUrl: string): Promise<IngestResult
     let blocked = 0;
     const tx = db.transaction((items: Parser.Item[]) => {
       for (const item of items) {
-        const title = (item.title || "").trim();
+        const title = decodeEntities((item.title || "").trim());
         const url = (item.link || "").trim();
         if (!title || !url) continue;
         // Block promo / affiliate / deal noise before it reaches the desk.

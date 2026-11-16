@@ -154,25 +154,39 @@ export function wordFrequencies(hours: number, top = 80): { word: string; count:
     `a an the and or but of to in on for with from by as at is are was were be been being
      it this that these those i you he she we they his her its our their not no yes
      new says say said will can could would should about after into over under out up
-     how what when where who why which more most some any all also just than then`.split(
+     how what when where who why which more most some any all also just than then
+     your have has now first one two back last`.split(
       /\s+/,
     ),
   );
+  for (const w of SPANISH_STOP) stop.add(w);
 
   const counts = new Map<string, number>();
   for (const { title } of rows) {
-    const words = title
-      .toLowerCase()
-      .replace(/[^a-z0-9\s'-]/g, " ")
-      .split(/\s+/)
-      .filter((w) => w.length > 2 && !stop.has(w) && !/^\d+$/.test(w));
-    for (const w of words) counts.set(w, (counts.get(w) || 0) + 1);
+    for (const w of tokenize(title)) {
+      if (stop.has(w)) continue;
+      counts.set(w, (counts.get(w) || 0) + 1);
+    }
   }
 
   return [...counts.entries()]
     .map(([word, count]) => ({ word, count }))
     .sort((a, b) => b.count - a.count)
     .slice(0, top);
+}
+
+const SPANISH_STOP = `el la los las un una unos unas y o pero de del al a en con por para sin sobre
+  entre hasta desde tras ante como que qué es son fue ser está están este esta estos estas
+  ese esa eso su sus se lo le les me te nos mas más muy ya no sí tras tras año años`.split(/\s+/);
+
+/** Lowercase letter/number tokens, keeping accented letters whole. */
+export function tokenize(title: string): string[] {
+  return title
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}\s'-]/gu, " ")
+    .split(/\s+/)
+    .map((w) => w.replace(/^['-]+|['-]+$/g, ""))
+    .filter((w) => w.length > 2 && !/^\d+$/.test(w));
 }
 
 export function lastUpdatedLabel(): number | null {

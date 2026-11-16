@@ -388,16 +388,11 @@ code {
 
 .feed__item {
   display: grid;
-  grid-template-columns: 7.5rem minmax(0, 1fr) auto;
+  grid-template-columns: 9rem minmax(0, 1fr) auto;
   gap: 0.75rem 1rem;
   align-items: baseline;
-  padding: 0.65rem 0.4rem;
+  padding: 0.65rem 0;
   border-bottom: 1px solid var(--line);
-  border-radius: 4px;
-}
-
-.feed__item:hover {
-  background: light-dark(#0000000a, #ffffff10);
 }
 
 .feed__source {
@@ -418,7 +413,6 @@ code {
   flex: none;
   width: 0.42rem;
   height: 0.42rem;
-  border-radius: 50%;
   margin-right: 0.4rem;
   background: var(--source-color, var(--ink-muted));
 }
@@ -471,16 +465,21 @@ code {
 }
 
 .headline-list li {
-  padding: 0.45rem 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.75rem 1rem;
+  align-items: baseline;
+  padding: 0.65rem 0;
   border-bottom: 1px solid var(--line);
 }
 
 .headline-list a.headline {
+  text-wrap: pretty;
   color: var(--ink);
   text-decoration: none;
   font-weight: 400;
   font-size: 1.05rem;
-  line-height: 1.45;
+  line-height: 1.4;
 }
 
 .headline-list a.headline:visited {
@@ -632,10 +631,9 @@ code {
 .digest__label {
   margin: 1.5rem 0 0.4rem;
   font-family: var(--font-sans);
-  font-size: 0.72rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  text-transform: capitalize;
   color: var(--ink-muted);
 }
 
@@ -815,6 +813,18 @@ code {
     white-space: nowrap;
   }
 
+  /* Pages with no tab-bar item show their name so the phone still says where you are. */
+  .desk__title--pinned {
+    position: static;
+    clip-path: none;
+    overflow: visible;
+    width: auto;
+    height: auto;
+    margin: 0;
+    padding: 0.25rem 0;
+    white-space: normal;
+  }
+
   .source-nav__title {
     display: none;
   }
@@ -904,7 +914,19 @@ code {
   }
 
   .headline-list li {
-    padding: 0.75rem 0;
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+    padding: 0.875rem 0;
+  }
+
+  /* Cancel the feed row's named "meta" area; this list has a single column. */
+  .headline-list .feed__meta {
+    grid-area: auto;
+    justify-self: start;
+  }
+
+  .headline-list .feed__meta time {
+    min-width: 2.25rem;
   }
 
   .tag {
@@ -913,10 +935,19 @@ code {
     min-height: 2.5rem;
   }
 
+  /* Phones keep the 40px target but outline the AI tag: a filled block on every row is loud. */
   .tag--ai {
     min-height: 2.5rem;
     padding: 0 0.875rem;
     font-size: 0.8125rem;
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+  }
+
+  .tag--ai:visited,
+  .tag--ai:hover {
+    color: var(--accent);
   }
 
   .brief-card__title {

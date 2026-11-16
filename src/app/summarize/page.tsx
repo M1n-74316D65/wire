@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
 export const metadata: Metadata = {
-  title: "Brief · wire",
+  title: "Summary · wire",
 };
 
 type Props = {
@@ -71,7 +71,7 @@ export default async function SummarizePage({ searchParams }: Props) {
       theme={theme}
       lastUpdated={lastUpdatedLabel()}
       showFilters={false}
-      title="Brief"
+      title="Summary"
     >
       <div className="brief-page">
         {!configured ? (

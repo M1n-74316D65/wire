@@ -377,19 +377,6 @@ export function fallbackTopic(topics: Topic[]): Topic | null {
  * well on both light and dark canvases; the slug is hashed into it so a source
  * always gets the same color. Pure + stable (testable).
  */
-const SOURCE_COLORS = [
-  "#2f6f6a",
-  "#6a4d2f",
-  "#4a5a8a",
-  "#7a4a5a",
-  "#3f6a3f",
-  "#8a5a2f",
-  "#5a4a8a",
-  "#2f5a7a",
-  "#6a3f3f",
-  "#4a6a5a",
-];
-
 function hashSlug(slug: string): number {
   let h = 0;
   for (let i = 0; i < slug.length; i++) {
@@ -398,8 +385,27 @@ function hashSlug(slug: string): number {
   return h;
 }
 
+function hslToHex(h: number, s: number, l: number): string {
+  const a = s * Math.min(l, 1 - l);
+  const channel = (n: number) => {
+    const k = (n + h / 30) % 12;
+    const v = l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1));
+    return Math.round(v * 255)
+      .toString(16)
+      .padStart(2, "0");
+  };
+  return `#${channel(0)}${channel(8)}${channel(4)}`;
+}
+
+/**
+ * One hue per source, spaced by the golden angle in registry order so
+ * neighbours never share a hue. Mid lightness keeps the dot visible on both
+ * the day and night grounds. Unknown slugs fall back to a hash.
+ */
 export function sourceColor(slug: string): string {
-  return SOURCE_COLORS[hashSlug(slug) % SOURCE_COLORS.length];
+  const i = SOURCES.findIndex((s) => s.slug === slug);
+  const hue = ((i >= 0 ? i : hashSlug(slug)) * 137.508) % 360;
+  return hslToHex(hue, 0.45, 0.55);
 }
 
 /** Topic assigned at ingest time, purely from the source's tags. */

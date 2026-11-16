@@ -12,7 +12,7 @@ import {
 } from "@/lib/digest";
 import { isSummarizeUnlocked } from "@/lib/summarize-auth";
 import { getTheme } from "@/lib/theme";
-import { SPAIN_TIME_ZONE } from "@/lib/time";
+import { nowMs, SPAIN_TIME_ZONE } from "@/lib/time";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -38,7 +38,7 @@ export default async function DigestPage({ searchParams }: Props) {
   const force = sp.force === "1";
   const wantRun = sp.run === "1" || force;
 
-  const ts = Date.now();
+  const ts = nowMs();
   const today = dayKey(ts);
   const yesterday = dayKey(ts - 24 * 60 * 60 * 1000);
   const requestedDay =
