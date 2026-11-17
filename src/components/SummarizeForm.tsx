@@ -8,10 +8,14 @@ export function SummarizeForm({
   url,
   title,
   unlocked,
+  autoUnlock = true,
 }: {
   url: string;
   title: string;
   unlocked: boolean;
+  /** False once the page has reported an error: a stored password that failed
+   *  must not be retried, or the redirect lands back here and submits again. */
+  autoUnlock?: boolean;
 }) {
   const formRef = useRef<HTMLFormElement>(null);
   const autoTried = useRef(false);
@@ -20,14 +24,19 @@ export function SummarizeForm({
   useEffect(() => {
     if (unlocked || autoTried.current) return;
     const pw = localStorage.getItem(SUMMARIZE_PW_KEY);
-    if (!pw || !formRef.current) return;
+    if (!pw) return;
+    if (!autoUnlock) {
+      localStorage.removeItem(SUMMARIZE_PW_KEY);
+      return;
+    }
+    if (!formRef.current) return;
     autoTried.current = true;
     const input = formRef.current.querySelector<HTMLInputElement>(
       'input[name="password"]',
     );
     if (input) input.value = pw;
     formRef.current.requestSubmit();
-  }, [unlocked]);
+  }, [unlocked, autoUnlock]);
 
   return (
     <form

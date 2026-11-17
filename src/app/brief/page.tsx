@@ -4,6 +4,7 @@ import { PageChrome } from "@/components/PageChrome";
 import { BriefForm } from "@/components/BriefForm";
 import { DigestBody } from "@/components/DigestBody";
 import { summarizeConfigured } from "@/lib/env";
+import { readerMessage } from "@/lib/errors";
 import {
   generateDigest,
   getCachedDigest,
@@ -64,7 +65,7 @@ export default async function DigestPage({ searchParams }: Props) {
       try {
         digest = await generateDigest({ day: requestedDay, topic: "home" });
       } catch (e) {
-        runError = e instanceof Error ? e.message : String(e);
+        runError = readerMessage(e, "The brief could not be written. Try again.");
       }
     }
   }

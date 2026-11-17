@@ -4,6 +4,7 @@ import { PageChrome } from "@/components/PageChrome";
 import { SummarizeForm } from "@/components/SummarizeForm";
 import { SummaryBody } from "@/components/SummaryBody";
 import { summarizeConfigured } from "@/lib/env";
+import { readerMessage } from "@/lib/errors";
 import { lastUpdatedLabel } from "@/lib/queries";
 import { getCachedSummary, summarizeUrl } from "@/lib/summarize";
 import { isSummarizeUnlocked } from "@/lib/summarize-auth";
@@ -57,7 +58,7 @@ export default async function SummarizePage({ searchParams }: Props) {
         model = row.model;
         createdAt = row.created_at;
       } catch (err) {
-        runError = err instanceof Error ? err.message : String(err);
+        runError = readerMessage(err, "The brief could not be written. Try again.");
       }
     }
   }
@@ -123,7 +124,12 @@ export default async function SummarizePage({ searchParams }: Props) {
             </footer>
           </article>
         ) : configured ? (
-          <SummarizeForm url={url} title={title} unlocked={unlocked} />
+          <SummarizeForm
+            url={url}
+            title={title}
+            unlocked={unlocked}
+            autoUnlock={!queryError}
+          />
         ) : null}
       </div>
     </PageChrome>

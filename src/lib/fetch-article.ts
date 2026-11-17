@@ -1,5 +1,6 @@
 import { Readability } from "@mozilla/readability";
 import { JSDOM } from "jsdom";
+import { DeskError } from "./errors";
 
 const MAX_CHARS = 48_000;
 const LEAD_CHARS = 16_000;
@@ -102,7 +103,7 @@ const MAX_BYTES = 2_000_000;
 
 async function readCapped(res: Response): Promise<string> {
   if (Number(res.headers.get("content-length") || 0) > MAX_BYTES) {
-    throw new Error("Article is too large");
+    throw new DeskError("The article is too large to read.");
   }
   const reader = res.body?.getReader();
   if (!reader) return "";
@@ -114,7 +115,7 @@ async function readCapped(res: Response): Promise<string> {
     total += value.length;
     if (total > MAX_BYTES) {
       await reader.cancel();
-      throw new Error("Article is too large");
+      throw new DeskError("The article is too large to read.");
     }
     chunks.push(value);
   }
@@ -122,18 +123,26 @@ async function readCapped(res: Response): Promise<string> {
 }
 
 export async function fetchArticleText(url: string): Promise<string> {
-  const res = await fetch(url, {
-    headers: {
-      "User-Agent":
-        "Mozilla/5.0 (compatible; wire/0.1; +https://news.m1n.land)",
-      Accept: "text/html,application/xhtml+xml",
-    },
-    redirect: "follow",
-    signal: AbortSignal.timeout(20_000),
-  });
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (compatible; wire/0.1; +https://news.m1n.land)",
+        Accept: "text/html,application/xhtml+xml",
+      },
+      redirect: "follow",
+      signal: AbortSignal.timeout(20_000),
+    });
+  } catch (err) {
+    if (err instanceof Error && err.name === "TimeoutError") {
+      throw new DeskError("The article took too long to load.");
+    }
+    throw new DeskError("Could not reach the article.");
+  }
 
   if (!res.ok) {
-    throw new Error(`Could not fetch article (${res.status})`);
+    throw new DeskError(`The article did not load (${res.status}).`);
   }
 
   const contentType = res.headers.get("content-type") || "";
@@ -143,7 +152,7 @@ export async function fetchArticleText(url: string): Promise<string> {
     !contentType.includes("text/plain") &&
     !contentType.includes("xml")
   ) {
-    throw new Error("URL is not an HTML article");
+    throw new DeskError("That link is not an article page.");
   }
 
   const body = await readCapped(res);
@@ -160,7 +169,7 @@ export async function fetchArticleText(url: string): Promise<string> {
   }
 
   if (blocks.join("\n").length < 200) {
-    throw new Error("Not enough readable text on the page");
+    throw new DeskError("There is not enough readable text on that page.");
   }
   return fitArticleText(blocks);
 }

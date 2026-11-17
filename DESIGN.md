@@ -63,8 +63,9 @@ components:
   feed-headline-hover:
     textColor: "{colors.deep-lagoon-teal}"
   tag-ai:
-    backgroundColor: "{colors.deep-lagoon-teal}"
-    textColor: "{colors.cool-paper}"
+    backgroundColor: "transparent"
+    textColor: "{colors.slate-muted}"
+    border: "1px solid {colors.mist-rule}"
     typography: "{typography.meta}"
 ---
 
@@ -113,7 +114,7 @@ A two-theme neutral system with a single cool accent. Day is the default; night 
 - **Ember Alert** (#ff7b72): error text in night theme.
 
 ### Named Rules
-**The One Accent Rule.** Deep Lagoon Teal appears only on hover, focus, and AI-produced labels. Its rarity is the point; a teal headline at rest breaks the desk. The AI tag is the single exception: it is a filled accent block, the one place accent fills a surface.
+**The One Accent Rule.** Deep Lagoon Teal appears only on hover, focus, and AI-produced labels. Its rarity is the point; a teal headline at rest breaks the desk. The AI brief control is the one place accent sits at rest, and only in its mark.
 
 **The Ink Not Black Rule.** Text is Graphite Ink, never pure black. Pure black on Cool Paper reads harsh over a long column.
 
@@ -196,8 +197,10 @@ Each component is text-first. Hover and focus are color changes, not motion.
 ### Theme Toggle
 - **Style:** three mono text options (`auto`, `day`, `night`) separated by faint dots. All three are submit buttons that post a form; the selected one is marked `aria-pressed="true"` and renders in Graphite Ink at weight 500.
 
-### AI Tag
-- **Style:** Outfit 0.72rem weight 600 in Cool Paper on a Deep Lagoon Teal fill (Night Harbor on Bright Lagoon in night theme), with a small spark glyph. It is the only place accent fills a surface in a list row.
+### AI Brief Control
+- **Style:** a hairline label, not a badge. 1px Mist Rule box, 0 radius, Plex Mono 0.7rem in Slate Muted, holding a drawn three-rule mark in Deep Lagoon Teal (Bright Lagoon in night theme) and the word `brief`.
+- **Hover / focus:** the box and the word take the accent. No fill, no underline.
+- **Why:** the accent lives in the mark, so the row still reads as text. A filled block on every row was the loudest thing on the desk, and a badge is the one thing this system refuses.
 
 ### Skip Link
 - **Style:** off-screen until focused, then a Graphite Ink outlined chip at the top-left in Outfit 0.9rem, targeting the main column.

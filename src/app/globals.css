@@ -517,32 +517,38 @@ code {
   text-decoration: underline;
 }
 
-/* AI summary: the one filled accent block in a row, so it is the first thing found */
-.tag--ai .tag__icon {
-  display: block;
-  width: 0.85rem;
-  height: 0.85rem;
-  flex: none;
-}
-
+/* AI brief: a hairline label, not a badge. The mark carries the accent at rest;
+   the box and the word take it on hover and focus. */
 .tag--ai {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  padding: 0.25rem 0.5rem;
-  background: var(--accent);
-  color: var(--bg);
-  font-family: var(--font-sans);
+  padding: 0.1rem 0.4rem 0.15rem;
+  border: 1px solid var(--line);
+  color: var(--ink-muted);
+  font-family: var(--font-mono);
   font-size: 0.72rem;
-  font-weight: 600;
   letter-spacing: 0.02em;
+  line-height: 1.5;
 }
 
-.tag--ai:visited,
-.tag--ai:hover {
-  color: var(--bg);
+.tag--ai .tag__mark {
+  display: block;
+  width: 0.75rem;
+  height: 0.75rem;
+  flex: none;
+  color: var(--accent);
+}
+
+.tag--ai:visited {
+  color: var(--ink-muted);
+}
+
+.tag--ai:hover,
+.tag--ai:focus-visible {
+  color: var(--accent);
+  border-color: var(--accent);
   text-decoration: none;
-  opacity: 0.88;
 }
 
 .empty-state {
@@ -911,6 +917,9 @@ code {
 
   .feed__meta {
     grid-area: meta;
+    /* The 40px AI target is taller than the time; centre the row instead of
+       hanging the box off the baseline. */
+    align-items: center;
   }
 
   .headline-list li {
@@ -935,19 +944,12 @@ code {
     min-height: 2.5rem;
   }
 
-  /* Phones keep the 40px target but outline the AI tag: a filled block on every row is loud. */
+  /* Phones keep the 40px target. The box is already hairline, so only the
+     padding and the label size change. */
   .tag--ai {
     min-height: 2.5rem;
-    padding: 0 0.875rem;
-    font-size: 0.8125rem;
-    background: transparent;
-    color: var(--accent);
-    border: 1px solid var(--accent);
-  }
-
-  .tag--ai:visited,
-  .tag--ai:hover {
-    color: var(--accent);
+    padding: 0 0.6rem;
+    font-size: 0.75rem;
   }
 
   .brief-card__title {
@@ -1010,9 +1012,5 @@ code {
   .summarize-form button,
   .theme-toggle button {
     min-height: 2.75rem;
-  }
-
-  .tag--ai {
-    padding-block: 0.5rem;
   }
 }

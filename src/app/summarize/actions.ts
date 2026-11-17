@@ -2,26 +2,12 @@
 
 import { redirect } from "next/navigation";
 import { summarizeConfigured } from "@/lib/env";
+import { safeArticleUrl } from "@/lib/summarize";
 import {
   checkPassword,
   isSummarizeUnlocked,
   unlockSummarize,
 } from "@/lib/summarize-auth";
-
-// Localhost, private and link-local addresses: the server must not fetch these.
-const PRIVATE_HOST =
-  /^(localhost$|.*\.localhost$|127\.|10\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.|0\.|\[::1\]$|\[f[cd])/;
-
-function safeUrl(raw: string): string | null {
-  try {
-    const u = new URL(raw);
-    if (u.protocol !== "http:" && u.protocol !== "https:") return null;
-    if (PRIVATE_HOST.test(u.hostname)) return null;
-    return u.toString();
-  } catch {
-    return null;
-  }
-}
 
 // Slows password guessing; a parallel flood still gets past it.
 function wrongPasswordDelay() {
@@ -46,7 +32,7 @@ export async function unlockAndSummarizeAction(formData: FormData) {
   const rawUrl = String(formData.get("url") || "");
   const title = String(formData.get("title") || "");
   const password = String(formData.get("password") || "");
-  const url = safeUrl(rawUrl);
+  const url = safeArticleUrl(rawUrl);
 
   if (!summarizeConfigured()) {
     redirect(`/summarize?error=${encodeURIComponent("not configured")}`);

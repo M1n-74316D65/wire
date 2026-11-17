@@ -2,8 +2,12 @@ import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { generateText } from "ai";
 import { getDb } from "./db";
 import { getAiConfig } from "./env";
+import { DeskError } from "./errors";
 import { getFeed } from "./queries";
 import type { Topic } from "./sources";
+
+/** Leaves room under the page's 60s budget. */
+const MODEL_TIMEOUT_MS = 45_000;
 
 export type DigestRow = {
   day: string;
@@ -95,7 +99,7 @@ export async function generateDigest(opts: {
   topic?: Topic | "all" | "home";
 }): Promise<DigestResult> {
   const ai = getAiConfig();
-  if (!ai) throw new Error("AI is not configured (AI_API_KEY)");
+  if (!ai) throw new DeskError("AI is not configured on this desk.");
 
   const hours = opts.hours ?? 24;
   const limit = opts.limit ?? 60;
@@ -106,7 +110,7 @@ export async function generateDigest(opts: {
   });
 
   if (feed.length === 0) {
-    throw new Error("No stories in this window to brief.");
+    throw new DeskError("No stories in this window to brief.");
   }
 
   const lines = feed.map(
@@ -119,18 +123,28 @@ export async function generateDigest(opts: {
     baseURL: ai.baseURL,
   });
 
-  const { text } = await generateText({
-    model: provider.chatModel(ai.model),
-    system: SYSTEM,
-    prompt: `Today is ${opts.day}.\n\n${feed.length} recent headlines:\n${lines.join(
-      "\n",
-    )}`,
-    maxOutputTokens: 900,
-    temperature: 0.2,
-  });
+  let text: string;
+  try {
+    ({ text } = await generateText({
+      model: provider.chatModel(ai.model),
+      system: SYSTEM,
+      prompt: `Today is ${opts.day}.\n\n${feed.length} recent headlines:\n${lines.join(
+        "\n",
+      )}`,
+      maxOutputTokens: 900,
+      temperature: 0.2,
+      maxRetries: 1,
+      abortSignal: AbortSignal.timeout(MODEL_TIMEOUT_MS),
+    }));
+  } catch (err) {
+    if (err instanceof Error && err.name === "TimeoutError") {
+      throw new DeskError("The model took too long. Try again.");
+    }
+    throw err;
+  }
 
   const content = text.trim();
-  if (!content) throw new Error("Model returned an empty digest");
+  if (!content) throw new DeskError("The model returned an empty brief.");
 
   const row: DigestRow = {
     day: opts.day,
