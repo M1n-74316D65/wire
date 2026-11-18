@@ -45,3 +45,7 @@ next-env.d.ts
 
 # local sqlite
 /data/
+
+# design-skill scratch
+.taste-skill/
+.impeccable/

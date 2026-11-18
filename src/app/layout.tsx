@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { IBM_Plex_Mono, Outfit } from "next/font/google";
+import { Outfit } from "next/font/google";
 import { PwaRegister } from "@/components/PwaRegister";
 import { getTheme } from "@/lib/theme";
 import "./globals.css";
@@ -7,13 +7,6 @@ import "./globals.css";
 const outfit = Outfit({
   subsets: ["latin"],
   variable: "--font-outfit",
-  display: "swap",
-});
-
-const plexMono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-plex-mono",
   display: "swap",
 });
 
@@ -65,7 +58,7 @@ export default async function RootLayout({
     <html
       lang="en"
       data-theme={theme}
-      className={`${outfit.variable} ${plexMono.variable}`}
+      className={outfit.variable}
     >
       <body>
         {children}

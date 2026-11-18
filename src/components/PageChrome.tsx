@@ -29,10 +29,6 @@ export function PageChrome({
   title?: string;
 }) {
   const health = getSourceHealth();
-  // Pages the phone tab bar already names keep a visually hidden title.
-  const inTabBar = ["home", "all", "spain", "tech", "words"].includes(
-    activeNav ?? "",
-  );
   return (
     <Shell>
       <SiteHeader theme={theme} lastUpdated={lastUpdated} />
@@ -43,15 +39,7 @@ export function PageChrome({
         </aside>
         <main id="content" className="desk__main" tabIndex={-1}>
           <div className="desk__bar">
-            {title ? (
-              <h2
-                className={
-                  inTabBar ? "desk__title" : "desk__title desk__title--pinned"
-                }
-              >
-                {title}
-              </h2>
-            ) : null}
+            {title ? <h1 className="desk__title">{title}</h1> : null}
             {showFilters && basePath != null && limit != null && hours != null ? (
               <Filters basePath={basePath} limit={limit} hours={hours} />
             ) : null}

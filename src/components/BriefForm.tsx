@@ -57,7 +57,7 @@ export function BriefForm({
       ) : (
         <p className="meta meta--wrap">Unlocked — writing the brief…</p>
       )}
-      <button type="submit">{unlocked ? "Write brief" : "Unlock & write"}</button>
+      <button type="submit">Write the brief</button>
     </form>
   );
 }

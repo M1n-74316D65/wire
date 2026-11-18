@@ -19,7 +19,7 @@ export default async function WordsPage({ searchParams }: Props) {
   const limit = parseLimit(sp.limit);
   const hours = parseHours(sp.hours);
   const theme = await getTheme();
-  const words = wordFrequencies(hours);
+  const words = wordFrequencies(hours, 120);
   const max = words[0]?.count || 1;
 
   return (
@@ -37,7 +37,7 @@ export default async function WordsPage({ searchParams }: Props) {
       </p>
       <div className="wordcloud">
         {words.map(({ word, count }) => {
-          const size = 0.85 + (count / max) * 1.75;
+          const size = 0.95 + (count / max) * 1.85;
           return (
             <span key={word} style={{ fontSize: `${size}rem` }} title={`${count}`}>
               {word}

@@ -83,14 +83,14 @@ export function SummarizeForm({
             autoFocus={fromFeed}
           />
           <p className="meta meta--wrap" id="password-hint">
-            Kept in this browser so the next ai tap skips the form.
+            Kept in this browser so the next tap skips the form.
           </p>
         </>
       ) : (
         <p className="meta meta--wrap">Unlocked — writing the brief…</p>
       )}
 
-      <button type="submit">{unlocked ? "Write brief" : "Unlock & write"}</button>
+      <button type="submit">Write the brief</button>
     </form>
   );
 }

@@ -33,9 +33,9 @@ export function SiteHeader({
     <header className="site-header">
       <div className="site-header__top">
         <div>
-          <h1 className="brand">
+          <p className="brand">
             <Link href="/">wire</Link>
-          </h1>
+          </p>
           <p className="tagline">
             <span className="tagline__motto">
               A quiet desk for the feeds you keep.{" "}
