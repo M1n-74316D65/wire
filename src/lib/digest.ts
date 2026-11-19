@@ -4,7 +4,10 @@ import { getDb } from "./db";
 import { getAiConfig } from "./env";
 import { DeskError } from "./errors";
 import { getFeed } from "./queries";
+import { dayKey } from "./time";
 import type { Topic } from "./sources";
+
+export { dayKey };
 
 /** Leaves room under the page's 60s budget. */
 const MODEL_TIMEOUT_MS = 45_000;
@@ -49,19 +52,6 @@ Formatting:
 
 Length: keep the whole briefing under ~400 words. If the list is small, be
 brief; do not pad. If it is large, pick the items that matter and drop the rest.`;
-
-export function dayKey(ts: number, timeZone: string = "Europe/Madrid"): string {
-  const d = new Date(ts);
-  const parts = new Intl.DateTimeFormat("en-CA", {
-    timeZone,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).formatToParts(d);
-  const get = (type: string) =>
-    parts.find((p) => p.type === type)?.value ?? "";
-  return `${get("year")}-${get("month")}-${get("day")}`;
-}
 
 export function getCachedDigest(day: string): DigestRow | null {
   const row = getDb()

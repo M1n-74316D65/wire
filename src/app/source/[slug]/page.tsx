@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { HeadlineList } from "@/components/HeadlineList";
 import { PageChrome } from "@/components/PageChrome";
 import { getSourceColumn, lastUpdatedLabel } from "@/lib/queries";
-import { getSource } from "@/lib/sources";
+import { getSource, hostOf } from "@/lib/sources";
 import { getTheme } from "@/lib/theme";
 import { nowMs, parseHours, parseLimit } from "@/lib/time";
 
@@ -34,6 +34,7 @@ export default async function SourcePage({ params, searchParams }: Props) {
 
   const theme = await getTheme();
   const now = nowMs();
+  const n = column.headlines.length;
 
   return (
     <PageChrome
@@ -44,8 +45,13 @@ export default async function SourcePage({ params, searchParams }: Props) {
       limit={limit}
       hours={hours}
       title={column.source.name}
+      streamMeta={`${hostOf(column.source.feedUrl)} · ${column.source.topics.join(", ")} · ${n} ${n === 1 ? "headline" : "headlines"} · window ${hours}h`}
     >
-      <HeadlineList headlines={column.headlines} now={now} />
+      <HeadlineList
+        headlines={column.headlines}
+        now={now}
+        emptyHref={`/source/${slug}?hours=24&limit=50`}
+      />
     </PageChrome>
   );
 }

@@ -9,6 +9,7 @@ import {
   getSource,
   SOURCES,
   sourcesForTopic,
+  TOPICS,
   type Source,
   type Topic,
 } from "./sources";
@@ -127,6 +128,30 @@ export function getFeed(opts: {
     )
     .all(since, ...slugs, opts.limit) as HeadlineRow[];
   return rows.map(mapRow);
+}
+
+/** Headline count per section key ("home", "all", topic slugs) in a window,
+ *  mirroring getFeed's source-based routing exactly. */
+export function getSectionCounts(hours: number): Record<string, number> {
+  const since = Date.now() - hours * 60 * 60 * 1000;
+  const rows = getDb()
+    .prepare(
+      `SELECT source_slug, COUNT(*) AS n FROM headlines
+       WHERE published_at >= ? GROUP BY source_slug`,
+    )
+    .all(since) as { source_slug: string; n: number }[];
+  const perSource = new Map(rows.map((r) => [r.source_slug, r.n]));
+  const counts: Record<string, number> = {};
+  const add = (key: string, sources: Source[]) => {
+    counts[key] = sources.reduce(
+      (acc, s) => acc + (perSource.get(s.slug) ?? 0),
+      0,
+    );
+  };
+  add("home", sourcesForTopic("home"));
+  add("all", sourcesForTopic("all"));
+  for (const t of TOPICS) add(t.slug, sourcesForTopic(t.slug));
+  return counts;
 }
 
 export function getSourceColumn(

@@ -31,6 +31,7 @@ export default async function WordsPage({ searchParams }: Props) {
       limit={limit}
       hours={hours}
       title="Words"
+      streamMeta={`${words.length} tokens · window ${hours}h`}
     >
       <p className="lede">
         Most common tokens in titles from the last {hours}h.

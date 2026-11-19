@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { unlockAndSummarizeAction } from "@/app/summarize/actions";
 import { SUMMARIZE_PW_KEY } from "@/lib/summarize-client";
 
@@ -19,6 +19,7 @@ export function SummarizeForm({
 }) {
   const formRef = useRef<HTMLFormElement>(null);
   const autoTried = useRef(false);
+  const [pending, setPending] = useState(false);
   const fromFeed = Boolean(url);
 
   useEffect(() => {
@@ -47,6 +48,7 @@ export function SummarizeForm({
         const fd = new FormData(e.currentTarget);
         const pw = String(fd.get("password") || "");
         if (pw) localStorage.setItem(SUMMARIZE_PW_KEY, pw);
+        setPending(true);
       }}
     >
       {fromFeed ? (
@@ -90,7 +92,9 @@ export function SummarizeForm({
         <p className="meta meta--wrap">Unlocked — writing the brief…</p>
       )}
 
-      <button type="submit">Write the brief</button>
+      <button type="submit" disabled={pending}>
+        {pending ? "Writing…" : "Write the brief"}
+      </button>
     </form>
   );
 }
