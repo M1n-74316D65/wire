@@ -59,12 +59,17 @@ Facts:
 export const SUMMARY_VERSION = 2;
 
 export function getCachedSummary(url: string): SummaryRow | null {
-  const row = getDb()
-    .prepare(
-      "SELECT url, title, summary, model, created_at FROM summaries WHERE url = ? AND version = ?",
-    )
-    .get(url, SUMMARY_VERSION) as SummaryRow | undefined;
-  return row ?? null;
+  try {
+    const row = getDb()
+      .prepare(
+        "SELECT url, title, summary, model, created_at FROM summaries WHERE url = ? AND version = ?",
+      )
+      .get(url, SUMMARY_VERSION) as SummaryRow | undefined;
+    return row ?? null;
+  } catch {
+    // Database unavailable: reads degrade to "no cache", writes stay loud.
+    return null;
+  }
 }
 
 export function saveSummary(row: Omit<SummaryRow, "created_at"> & { created_at?: number }) {

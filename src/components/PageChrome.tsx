@@ -4,7 +4,11 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteNav } from "@/components/SiteNav";
 import { SourceNav } from "@/components/SourceNav";
 import { TabBar } from "@/components/TabBar";
-import { getSourceHealth } from "@/lib/queries";
+import {
+  getSectionCounts,
+  getSourceHealth,
+  type SourceHealth,
+} from "@/lib/queries";
 import type { Theme } from "@/lib/theme";
 
 export function PageChrome({
@@ -17,6 +21,8 @@ export function PageChrome({
   children,
   showFilters = true,
   title,
+  streamMeta,
+  health: healthProp,
 }: {
   theme: Theme;
   lastUpdated: number | null;
@@ -27,14 +33,18 @@ export function PageChrome({
   children: React.ReactNode;
   showFilters?: boolean;
   title?: string;
+  streamMeta?: string;
+  /** Injected in tests so rendering never opens the SQLite file. */
+  health?: SourceHealth[];
 }) {
-  const health = getSourceHealth();
+  const health = healthProp ?? getSourceHealth();
+  const counts = hours != null ? getSectionCounts(hours) : undefined;
   return (
     <Shell>
       <SiteHeader theme={theme} lastUpdated={lastUpdated} />
       <div className="desk">
         <aside className="desk__rail">
-          <SiteNav active={activeNav} />
+          <SiteNav active={activeNav} counts={counts} />
           <SourceNav active={activeNav} health={health} />
         </aside>
         <main id="content" className="desk__main" tabIndex={-1}>
@@ -44,6 +54,7 @@ export function PageChrome({
               <Filters basePath={basePath} limit={limit} hours={hours} />
             ) : null}
           </div>
+          {streamMeta ? <p className="desk__meta">{streamMeta}</p> : null}
           {children}
         </main>
       </div>

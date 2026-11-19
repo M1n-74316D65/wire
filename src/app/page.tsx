@@ -17,6 +17,7 @@ export default async function HomePage({ searchParams }: Props) {
   const theme = await getTheme();
   const headlines = getFeed({ topic: "home", limit, hours });
   const now = nowMs();
+  const n = headlines.length;
 
   return (
     <PageChrome
@@ -27,8 +28,9 @@ export default async function HomePage({ searchParams }: Props) {
       limit={limit}
       hours={hours}
       title="Desk"
+      streamMeta={`${n} ${n === 1 ? "headline" : "headlines"} · window ${hours}h`}
     >
-      <FeedList headlines={headlines} now={now} />
+      <FeedList headlines={headlines} now={now} emptyHref="/?hours=24&limit=50" />
     </PageChrome>
   );
 }

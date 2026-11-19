@@ -9,6 +9,7 @@ import {
   getSource,
   SOURCES,
   sourcesForTopic,
+  TOPICS,
   type Source,
   type Topic,
 } from "./sources";
@@ -39,21 +40,33 @@ function mapRow(row: HeadlineRow): Headline {
   };
 }
 
+/** Read paths degrade to the fallback when the database cannot be opened;
+ *  write paths (ingest, summaries) still throw so failures stay loud. */
+function safe<T>(fallback: T, fn: () => T): T {
+  try {
+    return fn();
+  } catch {
+    return fallback;
+  }
+}
+
 export function queryHeadlines(opts: {
   sourceSlug: string;
   limit: number;
   hours: number;
 }): Headline[] {
-  const since = Date.now() - opts.hours * 60 * 60 * 1000;
-  const rows = getDb()
-    .prepare(
-      `SELECT * FROM headlines
-       WHERE source_slug = ? AND published_at >= ?
-       ORDER BY published_at DESC
-       LIMIT ?`,
-    )
-    .all(opts.sourceSlug, since, opts.limit) as HeadlineRow[];
-  return rows.map(mapRow);
+  return safe([], () => {
+    const since = Date.now() - opts.hours * 60 * 60 * 1000;
+    const rows = getDb()
+      .prepare(
+        `SELECT * FROM headlines
+         WHERE source_slug = ? AND published_at >= ?
+         ORDER BY published_at DESC
+         LIMIT ?`,
+      )
+      .all(opts.sourceSlug, since, opts.limit) as HeadlineRow[];
+    return rows.map(mapRow);
+  });
 }
 
 export function getColumns(opts: {
@@ -76,6 +89,14 @@ export function getColumns(opts: {
 
 /** Chronological stream across sources for a topic. */
 export function getFeed(opts: {
+  topic: Topic | "all" | "home";
+  limit: number;
+  hours: number;
+}): Headline[] {
+  return safe([], () => getFeedRows(opts));
+}
+
+function getFeedRows(opts: {
   topic: Topic | "all" | "home";
   limit: number;
   hours: number;
@@ -129,6 +150,38 @@ export function getFeed(opts: {
   return rows.map(mapRow);
 }
 
+/** Headline count per section key ("home", "all", topic slugs) in a window,
+ *  mirroring getFeed's source-based routing exactly. */
+export function getSectionCounts(hours: number): Record<string, number> {
+  return safe(emptySectionCounts(), () => {
+    const since = Date.now() - hours * 60 * 60 * 1000;
+    const rows = getDb()
+      .prepare(
+        `SELECT source_slug, COUNT(*) AS n FROM headlines
+         WHERE published_at >= ? GROUP BY source_slug`,
+      )
+      .all(since) as { source_slug: string; n: number }[];
+    const perSource = new Map(rows.map((r) => [r.source_slug, r.n]));
+    const counts: Record<string, number> = {};
+    const add = (key: string, sources: Source[]) => {
+      counts[key] = sources.reduce(
+        (acc, s) => acc + (perSource.get(s.slug) ?? 0),
+        0,
+      );
+    };
+    add("home", sourcesForTopic("home"));
+    add("all", sourcesForTopic("all"));
+    for (const t of TOPICS) add(t.slug, sourcesForTopic(t.slug));
+    return counts;
+  });
+}
+
+function emptySectionCounts(): Record<string, number> {
+  const counts: Record<string, number> = { home: 0, all: 0 };
+  for (const t of TOPICS) counts[t.slug] = 0;
+  return counts;
+}
+
 export function getSourceColumn(
   slug: string,
   limit: number,
@@ -143,6 +196,10 @@ export function getSourceColumn(
 }
 
 export function wordFrequencies(hours: number, top = 80): { word: string; count: number }[] {
+  return safe([], () => wordFrequenciesRows(hours, top));
+}
+
+function wordFrequenciesRows(hours: number, top = 80): { word: string; count: number }[] {
   const since = Date.now() - hours * 60 * 60 * 1000;
   const rows = getDb()
     .prepare(
@@ -190,7 +247,7 @@ export function tokenize(title: string): string[] {
 }
 
 export function lastUpdatedLabel(): number | null {
-  return getLastIngestAt();
+  return safe(null, () => getLastIngestAt());
 }
 
 export type SourceHealth = {
@@ -222,7 +279,16 @@ function healthFor(slug: string, s: SourceStatus | null): SourceHealth {
 
 /** Health of every source (fresh / stale / failed / never-fetched). */
 export function getSourceHealth(): SourceHealth[] {
-  const map = new Map<string, SourceStatus>();
-  for (const s of getAllSourceStatus()) map.set(s.source_slug, s);
-  return SOURCES.map((src) => healthFor(src.slug, map.get(src.slug) ?? null));
+  return safe(
+    SOURCES.map((src) => ({
+      slug: src.slug,
+      state: "never" as const,
+      detail: null,
+    })),
+    () => {
+      const map = new Map<string, SourceStatus>();
+      for (const s of getAllSourceStatus()) map.set(s.source_slug, s);
+      return SOURCES.map((src) => healthFor(src.slug, map.get(src.slug) ?? null));
+    },
+  );
 }

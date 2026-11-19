@@ -142,7 +142,7 @@ A two-theme neutral system with a single cool accent. Day is the default; night 
 
 A single centered shell, `min(1080px, 100% - 2rem)`, with 1.75rem top padding and 4rem bottom. Below the header, a two-column desk: a 9.5rem rail on the left and a fluid main column, separated by a 2.5rem gap, top-aligned.
 
-The feed is a three-part grid per row: a 7.5rem source column, a fluid headline column, and an auto meta column, with 0.65rem vertical padding and a 1px rule between rows. Long-form summary text stops at 40rem; the brief page at 36rem.
+The feed is a three-part grid per row: a 7.5rem source column, a fluid headline column, and an auto meta column, with 0.65rem vertical padding and a 1px rule between rows. Rows are grouped under sticky day dividers ("Today", "Yesterday", "Wed 19 Nov" plus a mono count) that ride the top of the viewport while their day scrolls. A one-line mono meta under the title bar states what the stream holds ("12 headlines · window 24h"). The sections rail shows each section's count for the current window in tabular mono. Long-form summary text stops at 40rem; the brief page at 36rem.
 
 Responsive behavior:
 - At 760px and below, the desk collapses to one column. The section rail becomes a horizontal scroll row with a bottom rule, the sources list and the section label are hidden, and the theme becomes a five-item bottom tab bar.
@@ -170,6 +170,7 @@ Each component is text-first. Hover and focus are color changes, not motion.
 - **Shape:** rectangle, 0 radius, 1px solid Graphite Ink outline.
 - **Default:** transparent background, Graphite Ink text, Outfit 0.9rem weight 500, padding 0.45rem 0.9rem, margin-top 0.5rem.
 - **Hover:** Graphite Ink fill with Cool Paper text. This is the only inversion in the system.
+- **Pending (disabled while the action runs):** no fill, Slate Muted text, Mist Rule outline, label swaps to "Writing…".
 - **Focus:** the global 2px Deep Lagoon Teal outline, offset 2px.
 
 ### Inputs / Fields
@@ -180,13 +181,23 @@ Each component is text-first. Hover and focus are color changes, not motion.
 ### Feed Row
 - **Source:** Outfit 0.82rem, Slate Muted, truncates with ellipsis, teal on hover.
 - **Headline:** Georgia 1.05rem, Graphite Ink, teal on hover, Slate Muted once visited.
-- **Meta:** Plex Mono 0.72rem, Slate Muted, tabular numerals, no wrap.
+- **Meta:** Plex Mono 0.72rem, Slate Muted, tabular numerals, no wrap. The relative time carries the absolute desk time ("Wed 19 Nov, 14:32") in its `title`.
 - **Divider:** 1px Mist Rule below each row.
 
+### Day Divider
+- **Style:** a sticky row at the top of the stream: uppercase Outfit 0.72rem label in Slate Muted on the left, the day's headline count in Plex Mono on the right, 1px Mist Rule below, page-colored background so rows scroll under it.
+- **Labels:** "Today", "Yesterday", otherwise "Wed 19 Nov" — all in Europe/Madrid.
+
+### Stream Meta
+- **Style:** one Plex Mono 0.72rem line in Slate Muted directly under the title bar: "12 headlines · window 24h". Facts only, no framing.
+
+### Empty State
+- **Style:** one plain sentence plus a text link to the next wider window ("Widen it to the last 24 hours"). No illustration, no card.
+
 ### Navigation (Sections Rail)
-- **Style:** Outfit 0.9rem, Slate Muted links, 0.2rem vertical padding, no underline.
+- **Style:** Outfit 0.9rem, Slate Muted links, 0.2rem vertical padding, no underline, each row a flex line with the section's headline count for the current window in Plex Mono 0.72rem tabular numerals at the right.
 - **Hover:** Graphite Ink text.
-- **Active:** the current section is a non-link span in Graphite Ink at weight 600.
+- **Active:** the current section is a non-link span in Graphite Ink at weight 600, count in Graphite Ink.
 - **Mobile:** single horizontal scroll row, no wrap, with a bottom rule.
 
 ### Filters
@@ -209,6 +220,7 @@ Each component is text-first. Hover and focus are color changes, not motion.
 
 ### Do:
 - **Do** keep every row in the stream as one headline line: source, headline, meta, in that order.
+- **Do** group the stream under sticky day dividers, keeping the time order inside each day.
 - **Do** use Mist Rule 1px dividers to separate rows and sections.
 - **Do** use the accent only for hover, focus, and AI-produced labels.
 - **Do** keep timestamps and counts in Plex Mono with tabular numerals.

@@ -418,3 +418,12 @@ export function sourcesForTopic(topic: Topic | "all" | "home"): Source[] {
   if (topic === "all") return SOURCES;
   return SOURCES.filter((s) => s.topics.includes(topic));
 }
+
+/** Bare hostname of a feed URL, for stating where a source lives. */
+export function hostOf(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return url;
+  }
+}

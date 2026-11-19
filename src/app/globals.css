@@ -238,6 +238,15 @@ code {
   border-bottom: 1px solid var(--line);
 }
 
+/* One factual line under the bar: what this stream holds right now. */
+.desk__meta {
+  margin: 0.25rem 0 0.9rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+
 /* The page's one h1: a noun naming the screen, at reading weight. */
 .desk__title {
   margin: 0;
@@ -277,11 +286,26 @@ code {
 
 .topic-nav a,
 .topic-nav span.is-active {
-  display: block;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
   padding: 0.2rem 0;
   color: var(--ink-muted);
   text-decoration: none;
   line-height: 1.35;
+}
+
+/* Per-section headline count in the current window, tabular mono. */
+.topic-nav__count {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-muted);
+}
+
+.topic-nav span.is-active .topic-nav__count {
+  color: var(--ink);
 }
 
 .topic-nav a:visited {
@@ -452,6 +476,36 @@ code {
   color: var(--ink-muted);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+}
+
+/* Day divider: a sticky label row that rides the top of the viewport while
+   its day scrolls underneath. Small caps sans label, mono count, hairline. */
+.feed li.feed__day,
+.headline-list li.feed__day {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.6rem 0 0.4rem;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.feed__day-count {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  font-variant-numeric: tabular-nums;
 }
 
 .headline-list {
@@ -758,6 +812,15 @@ code {
   color: var(--bg);
 }
 
+/* Pending: the action is running; no inversion while disabled. */
+.summarize-form button:disabled,
+.summarize-form button:disabled:hover {
+  background: transparent;
+  color: var(--ink-muted);
+  border-color: var(--line);
+  cursor: default;
+}
+
 .error {
   color: var(--danger);
 }
@@ -767,6 +830,8 @@ code {
   flex-wrap: wrap;
   gap: 0.5rem 0.85rem;
   align-items: baseline;
+  max-width: 44rem;
+  line-height: 1.4;
 }
 
 .wordcloud span {
