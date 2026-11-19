@@ -5,7 +5,13 @@ import { PageChrome } from "../src/components/PageChrome";
 import { SOURCES, sourceColor } from "../src/lib/sources";
 
 const html = renderToStaticMarkup(
-  <PageChrome theme="system" lastUpdated={0} activeNav="hn" showFilters={false}>
+  <PageChrome
+    theme="system"
+    lastUpdated={0}
+    activeNav="hn"
+    showFilters={false}
+    health={[]}
+  >
     {null}
   </PageChrome>,
 );

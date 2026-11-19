@@ -4,7 +4,11 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteNav } from "@/components/SiteNav";
 import { SourceNav } from "@/components/SourceNav";
 import { TabBar } from "@/components/TabBar";
-import { getSectionCounts, getSourceHealth } from "@/lib/queries";
+import {
+  getSectionCounts,
+  getSourceHealth,
+  type SourceHealth,
+} from "@/lib/queries";
 import type { Theme } from "@/lib/theme";
 
 export function PageChrome({
@@ -18,6 +22,7 @@ export function PageChrome({
   showFilters = true,
   title,
   streamMeta,
+  health: healthProp,
 }: {
   theme: Theme;
   lastUpdated: number | null;
@@ -29,8 +34,10 @@ export function PageChrome({
   showFilters?: boolean;
   title?: string;
   streamMeta?: string;
+  /** Injected in tests so rendering never opens the SQLite file. */
+  health?: SourceHealth[];
 }) {
-  const health = getSourceHealth();
+  const health = healthProp ?? getSourceHealth();
   const counts = hours != null ? getSectionCounts(hours) : undefined;
   return (
     <Shell>
