@@ -54,12 +54,17 @@ Length: keep the whole briefing under ~400 words. If the list is small, be
 brief; do not pad. If it is large, pick the items that matter and drop the rest.`;
 
 export function getCachedDigest(day: string): DigestRow | null {
-  const row = getDb()
-    .prepare(
-      "SELECT day, model, content, created_at FROM digests WHERE day = ?",
-    )
-    .get(day) as DigestRow | undefined;
-  return row ?? null;
+  try {
+    const row = getDb()
+      .prepare(
+        "SELECT day, model, content, created_at FROM digests WHERE day = ?",
+      )
+      .get(day) as DigestRow | undefined;
+    return row ?? null;
+  } catch {
+    // Database unavailable: reads degrade to "no cache", writes stay loud.
+    return null;
+  }
 }
 
 export function saveDigest(row: Omit<DigestRow, "created_at"> & {

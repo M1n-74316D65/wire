@@ -13,8 +13,11 @@ export type HeadlineRow = {
   topic: string | null;
 };
 
-const DATA_DIR = path.join(process.cwd(), "data");
-const DB_PATH = path.join(DATA_DIR, "news.sqlite");
+// WIRE_DB_PATH overrides the file location (tests use it to simulate a
+// database that cannot be opened). Empty string falls back to the default.
+const DB_PATH =
+  process.env.WIRE_DB_PATH || path.join(process.cwd(), "data", "news.sqlite");
+const DATA_DIR = path.dirname(DB_PATH);
 
 let db: Database.Database | null = null;
 
