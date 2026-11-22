@@ -156,7 +156,7 @@ The page header combines a 2rem title, a factual summary of the current window, 
 
 Responsive behavior:
 - At 760px and below, the desktop index is `display: none`. A 48px mobile header shows the wordmark and a native `details` / `summary` Browse disclosure.
-- The Browse panel contains the same Sections, Sources, and theme controls as desktop. It fills the remaining dynamic viewport, scrolls independently, and leaves the bottom quick-navigation bar available behind it.
+- The Browse panel contains the same Sections, Sources, and theme controls as desktop. It fills the remaining dynamic viewport and scrolls independently. While it is open, the covered reading plane and quick bar are `visibility: hidden`, so keyboard focus cannot move into obscured controls.
 - Feed rows stack into source and meta above a full-width headline. Source-page lists keep headline then meta without visually reordering their DOM.
 - The existing five-item bottom tab bar provides peer shortcuts. The shell adds safe-area and bottom-tab clearance.
 - Content margins are 16px on phones. No horizontal topic strip or clipped source list remains.
@@ -206,7 +206,7 @@ Each component is text-first. Hover and focus are color changes, not motion.
 - **Style:** Outfit 0.8125rem in Slate Muted with tabular numerals; each option is a text link.
 - **Active:** Graphite Ink at weight 650 on Active Wash, with `aria-current="page"`.
 - **Hover:** Deep Lagoon Teal with underline.
-- **Words:** the unused headline-count group is omitted; only the time window remains.
+- **Words:** the unused headline-count group is omitted; only the time window remains. An empty window gets the same quiet empty-state treatment as the feed.
 
 ### Theme Toggle
 - **Style:** three Outfit text options (`auto`, `day`, `night`) separated by faint dots. All three are submit buttons that post the existing server form.
@@ -219,7 +219,7 @@ Each component is text-first. Hover and focus are color changes, not motion.
 ### Empty and Loading States
 - **Empty:** a 1.5rem Georgia statement and one plain next action, with generous vertical space and a bottom rule. Never recommend an unavailable wider window.
 - **Loading:** static neutral paragraph-shaped fields at real body size. No shimmer or invented content.
-- **Alerts:** plain Outfit error text in Brick Alert or Ember Alert; no marketing-style banner.
+- **Alerts:** plain Outfit error text in Brick Alert or Ember Alert; no marketing-style banner. Duplicate query and run messages collapse to one visible alert.
 
 ### Skip Link
 - **Style:** off-screen until focused, then a Graphite Ink outlined control at the top-left in Outfit 0.9rem, targeting the one main landmark.

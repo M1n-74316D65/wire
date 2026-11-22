@@ -5,6 +5,7 @@ import { FeedList } from "../src/components/FeedList";
 import { Filters } from "../src/components/Filters";
 import { HeadlineList } from "../src/components/HeadlineList";
 import { PageChrome } from "../src/components/PageChrome";
+import { WordCloud } from "../src/components/WordCloud";
 import type { Headline } from "../src/lib/queries";
 
 function render(element: React.ReactNode): Document {
@@ -145,4 +146,26 @@ assert.equal(
   wordsChrome.querySelector(".desk__summary")?.textContent,
   "Word size follows frequency in headline titles.",
   "Words must explain its own visualization rather than promise a headline count",
+);
+
+const emptyWords24 = render(<WordCloud words={[]} hours={24} />);
+const emptyWordsText = emptyWords24.querySelector(".empty-state")?.textContent ?? "";
+assert.match(emptyWordsText, /No words in this window\./);
+assert.match(emptyWordsText, /Choose a section or source/);
+assert.doesNotMatch(emptyWordsText, /wider window/);
+
+const emptyWords6 = render(<WordCloud words={[]} hours={6} />);
+assert.match(
+  emptyWords6.querySelector(".empty-state")?.textContent ?? "",
+  /Try a wider window\./,
+  "a non-maximum empty window can suggest the available wider window",
+);
+
+const populatedWords = render(
+  <WordCloud words={[{ word: "wire", count: 3 }]} hours={6} />,
+);
+assert(populatedWords.querySelector(".wordcloud"), "populated words still render the cloud");
+assert.match(
+  populatedWords.querySelector(".wordcloud")?.textContent ?? "",
+  /wire/,
 );

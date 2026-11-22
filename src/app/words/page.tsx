@@ -1,4 +1,5 @@
 import { PageChrome } from "@/components/PageChrome";
+import { WordCloud } from "@/components/WordCloud";
 import { lastUpdatedLabel, wordFrequencies } from "@/lib/queries";
 import { getTheme } from "@/lib/theme";
 import { parseHours, parseLimit } from "@/lib/time";
@@ -20,7 +21,6 @@ export default async function WordsPage({ searchParams }: Props) {
   const hours = parseHours(sp.hours);
   const theme = await getTheme();
   const words = wordFrequencies(hours, 120);
-  const max = words[0]?.count || 1;
 
   return (
     <PageChrome
@@ -37,16 +37,7 @@ export default async function WordsPage({ searchParams }: Props) {
       <p className="lede">
         Most common tokens in titles from the last {hours}h.
       </p>
-      <div className="wordcloud">
-        {words.map(({ word, count }) => {
-          const size = 0.95 + (count / max) * 1.85;
-          return (
-            <span key={word} style={{ fontSize: `${size}rem` }} title={`${count}`}>
-              {word}
-            </span>
-          );
-        })}
-      </div>
+      <WordCloud words={words} hours={hours} />
     </PageChrome>
   );
 }
