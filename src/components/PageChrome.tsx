@@ -19,6 +19,7 @@ export function PageChrome({
   hours,
   children,
   showFilters = true,
+  showLimit = true,
   title,
   summary,
 }: {
@@ -30,6 +31,7 @@ export function PageChrome({
   hours?: number;
   children: React.ReactNode;
   showFilters?: boolean;
+  showLimit?: boolean;
   title?: string;
   summary?: string;
 }) {
@@ -85,7 +87,12 @@ export function PageChrome({
                 ) : null}
               </div>
               {showFilters && hasFilters ? (
-                <Filters basePath={basePath} limit={limit} hours={hours} />
+                <Filters
+                  basePath={basePath}
+                  limit={limit}
+                  hours={hours}
+                  showLimit={showLimit}
+                />
               ) : null}
             </div>
             {children}

@@ -30,7 +30,9 @@ export default async function WordsPage({ searchParams }: Props) {
       basePath="/words"
       limit={limit}
       hours={hours}
+      showLimit={false}
       title="Words"
+      summary="Word size follows frequency in headline titles."
     >
       <p className="lede">
         Most common tokens in titles from the last {hours}h.

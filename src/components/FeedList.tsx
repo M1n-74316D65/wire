@@ -16,7 +16,8 @@ export function FeedList({
   if (headlines.length === 0) {
     return (
       <div className="empty-state">
-        <p>Nothing in this window. Try a wider time range.</p>
+        <p className="empty-state__title">Nothing in this window.</p>
+        <p>Choose a section or source to keep reading.</p>
       </div>
     );
   }

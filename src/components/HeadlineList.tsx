@@ -17,7 +17,7 @@ export function HeadlineList({
   }
 
   return (
-    <ul className="headline-list" role="list">
+    <ol className="headline-list" role="list">
       {headlines.map((h) => {
         return (
           <li key={`${h.sourceSlug}:${h.url}`}>
@@ -43,6 +43,6 @@ export function HeadlineList({
           </li>
         );
       })}
-    </ul>
+    </ol>
   );
 }
