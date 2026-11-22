@@ -661,7 +661,6 @@ code {
 }
 
 .empty-state {
-  max-inline-size: 38rem;
   padding-block: clamp(3rem, 10vh, 7rem);
   border-block-end: 1px solid var(--line);
 }
@@ -921,6 +920,20 @@ code {
     row-gap: 0.25rem;
   }
 
+  .feed__source {
+    align-items: flex-start;
+    white-space: normal;
+  }
+
+  .feed__source-dot {
+    margin-block-start: 0.4em;
+  }
+
+  .feed__source-name {
+    overflow: visible;
+    text-overflow: clip;
+  }
+
   .feed__meta {
     justify-content: flex-start;
   }
@@ -998,6 +1011,10 @@ code {
 
   .browse-disclosure[open] summary::after {
     content: "−";
+  }
+
+  .browse-disclosure:not([open]) > .browse-sheet {
+    display: none;
   }
 
   .browse-sheet {

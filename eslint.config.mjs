@@ -11,6 +11,7 @@ const eslintConfig = defineConfig([
     ".next/**",
     "out/**",
     "build/**",
+    ".taste-skill/**",
     "next-env.d.ts",
   ]),
 ]);

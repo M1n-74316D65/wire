@@ -152,7 +152,7 @@ The centered shell is at most 90rem wide with equal responsive outer margins (`c
 
 The index is one dynamic-viewport-height column. Its middle scrolls independently with a stable scrollbar gutter and contained overscroll; the brand and rail footer stay in place. The reading canvas is capped at 68rem, with long-form reading capped at 40rem.
 
-The page header combines a 2rem title, a factual summary of the current window, and wrapping filter links above one rule. Desktop feed rows use an 8.75rem source column, fluid headline, and automatic meta column with 1rem vertical padding. Between 761px and 1100px, source and meta share a 7.5rem column beside the headline.
+The page header combines a 2rem title, a factual summary of the current window, and wrapping filter links above one rule. Desktop feed rows use an 8.75rem source column, fluid headline, and automatic meta column with 1rem vertical padding. Between 761px and 1100px, source and meta share a 7.5rem column beside the headline; long source names wrap instead of ellipsizing.
 
 Responsive behavior:
 - At 760px and below, the desktop index is `display: none`. A 48px mobile header shows the wordmark and a native `details` / `summary` Browse disclosure.
