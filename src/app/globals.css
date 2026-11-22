@@ -1037,7 +1037,7 @@ code {
   }
 
   /* While the sheet is open, remove the covered reading plane and quick bar from focus. */
-  .shell:has(.browse-disclosure[open]) .desk__workspace,
+  .shell:has(.browse-disclosure[open]) .desk__main,
   .shell:has(.browse-disclosure[open]) .tabbar {
     visibility: hidden;
   }
