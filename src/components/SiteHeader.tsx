@@ -1,64 +1,12 @@
 import Link from "next/link";
-import { setThemeAction } from "@/app/actions";
-import { formatLastUpdated, nowMs } from "@/lib/time";
-import type { Theme } from "@/lib/theme";
 
-function ThemeOption({
-  current,
-  value,
-  label,
-}: {
-  current: Theme;
-  value: Theme;
-  label: string;
-}) {
-  return (
-    <form action={setThemeAction}>
-      <input type="hidden" name="theme" value={value} />
-      <button type="submit" aria-pressed={current === value}>
-        {label}
-      </button>
-    </form>
-  );
-}
-
-export function SiteHeader({
-  theme,
-  lastUpdated,
-}: {
-  theme: Theme;
-  lastUpdated: number | null;
-}) {
+export function SiteHeader() {
   return (
     <header className="site-header">
-      <div className="site-header__top">
-        <div>
-          <p className="brand">
-            <Link href="/">wire</Link>
-          </p>
-          <p className="tagline">
-            <span className="tagline__motto">
-              A quiet desk for the feeds you keep.{" "}
-            </span>
-            Pulled{" "}
-            <time dateTime={new Date(lastUpdated ?? nowMs()).toISOString()}>
-              {formatLastUpdated(lastUpdated)}
-            </time>
-            .
-          </p>
-        </div>
-        <div className="theme-toggle" role="group" aria-label="Color theme">
-          <ThemeOption current={theme} value="system" label="auto" />
-          <span className="sep" aria-hidden="true">
-            ·
-          </span>
-          <ThemeOption current={theme} value="light" label="day" />
-          <span className="sep" aria-hidden="true">
-            ·
-          </span>
-          <ThemeOption current={theme} value="dark" label="night" />
-        </div>
-      </div>
+      <p className="brand">
+        <Link href="/">wire</Link>
+      </p>
+      <p className="tagline">A quiet desk for the feeds you keep.</p>
     </header>
   );
 }
