@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { ErrorMessages } from "@/components/ErrorMessages";
 import { PageChrome } from "@/components/PageChrome";
 import { SummarizeForm } from "@/components/SummarizeForm";
 import { SummaryBody } from "@/components/SummaryBody";
@@ -82,16 +83,7 @@ export default async function SummarizePage({ searchParams }: Props) {
           </p>
         ) : null}
 
-        {queryError ? (
-          <p className="error" role="alert">
-            Error: {queryError}
-          </p>
-        ) : null}
-        {runError ? (
-          <p className="error" role="alert">
-            Error: {runError}
-          </p>
-        ) : null}
+        <ErrorMessages messages={[queryError, runError]} />
 
         {summaryText ? (
           <article className="brief-card">

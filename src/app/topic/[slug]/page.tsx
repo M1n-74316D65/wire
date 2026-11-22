@@ -44,7 +44,6 @@ export default async function TopicPage({ params, searchParams }: Props) {
   const headlines = getFeed({ topic, limit, hours });
   const now = nowMs();
   const title = topicLabel(slug);
-  const n = headlines.length;
 
   return (
     <PageChrome
@@ -55,13 +54,8 @@ export default async function TopicPage({ params, searchParams }: Props) {
       limit={limit}
       hours={hours}
       title={title}
-      streamMeta={`${n} ${n === 1 ? "headline" : "headlines"} · window ${hours}h`}
     >
-      <FeedList
-        headlines={headlines}
-        now={now}
-        emptyHref={`/topic/${slug}?hours=24&limit=50`}
-      />
+      <FeedList headlines={headlines} now={now} />
     </PageChrome>
   );
 }

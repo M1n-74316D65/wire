@@ -53,7 +53,7 @@ assert.equal(getCachedDigest("2026-01-01"), null);
 assert.equal(getCachedSummary("https://example.com/a"), null);
 
 // The chrome itself renders with the database down (no health injected),
-// exercising getSourceHealth + getSectionCounts through the component.
+// exercising getSourceHealth through the component.
 const { renderToStaticMarkup } = await import("react-dom/server");
 const { PageChrome } = await import("../src/components/PageChrome");
 const html = renderToStaticMarkup(
@@ -70,7 +70,7 @@ const html = renderToStaticMarkup(
   </PageChrome>,
 );
 assert.match(html, /aria-label="Sources"/, "rail still renders");
-assert.match(html, /topic-nav__count">0</, "counts render as zero");
+assert.doesNotMatch(html, /topic-nav__count/, "reading chrome renders no rail counts");
 
 fs.rmSync(dir, { recursive: true, force: true });
 console.log("db-unavailable: ok");

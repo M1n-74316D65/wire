@@ -18,33 +18,37 @@ export function Filters({
   basePath,
   limit,
   hours,
+  showLimit = true,
 }: {
   basePath: string;
   limit: number;
   hours: number;
+  showLimit?: boolean;
 }) {
   const current = { limit, hours };
 
   return (
     <div className="filters">
-      <div className="filter-group" role="group" aria-labelledby="filter-show">
-        <span className="filter-group__label" id="filter-show">
-          show
-        </span>
-        <div className="filter-group__opts">
-          {LIMIT_OPTIONS.map((n) =>
-            n === limit ? (
-              <span key={n} className="is-active">
-                {n}
-              </span>
-            ) : (
-              <a key={n} href={buildHref(basePath, current, { limit: n })}>
-                {n}
-              </a>
-            ),
-          )}
+      {showLimit ? (
+        <div className="filter-group" role="group" aria-labelledby="filter-show">
+          <span className="filter-group__label" id="filter-show">
+            show
+          </span>
+          <div className="filter-group__opts">
+            {LIMIT_OPTIONS.map((n) =>
+              n === limit ? (
+                <span key={n} className="is-active" aria-current="page">
+                  {n}
+                </span>
+              ) : (
+                <a key={n} href={buildHref(basePath, current, { limit: n })}>
+                  {n}
+                </a>
+              ),
+            )}
+          </div>
         </div>
-      </div>
+      ) : null}
       <div
         className="filter-group"
         role="group"
@@ -56,7 +60,7 @@ export function Filters({
         <div className="filter-group__opts">
           {HOUR_OPTIONS.map((n) =>
             n === hours ? (
-              <span key={n} className="is-active">
+              <span key={n} className="is-active" aria-current="page">
                 {n}h
               </span>
             ) : (

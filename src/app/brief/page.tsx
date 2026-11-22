@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { PageChrome } from "@/components/PageChrome";
 import { BriefForm } from "@/components/BriefForm";
 import { DigestBody } from "@/components/DigestBody";
+import { ErrorMessages } from "@/components/ErrorMessages";
 import { summarizeConfigured } from "@/lib/env";
 import { readerMessage } from "@/lib/errors";
 import {
@@ -90,16 +91,7 @@ export default async function DigestPage({ searchParams }: Props) {
           </p>
         ) : null}
 
-        {sp.error ? (
-          <p className="error" role="alert">
-            Error: {sp.error}
-          </p>
-        ) : null}
-        {runError ? (
-          <p className="error" role="alert">
-            Error: {runError}
-          </p>
-        ) : null}
+        <ErrorMessages messages={[sp.error, runError]} />
 
         {digest ? (
           <article className="brief-card">
